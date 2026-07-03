@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { AuthService } from '../services/authService';
 import type { AdminUser } from '../models/types';
 import {
@@ -17,16 +16,7 @@ import {
 
 type View = 'login' | 'forgot' | 'sent';
 
-function GoogleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" fill="#4285F4" />
-      <path d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z" fill="#34A853" />
-      <path d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z" fill="#FBBC05" />
-      <path d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z" fill="#EA4335" />
-    </svg>
-  );
-}
+
 
 function BrandPanel() {
   const features = [
@@ -104,7 +94,6 @@ function BrandPanel() {
 }
 
 export function Login() {
-  const { loginWithGoogle } = useAuth();
   const [view, setView] = useState<View>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -126,22 +115,17 @@ export function Login() {
     setLoading(true);
     try {
       const { user, token } = await AuthService.loginWithEmail(email, password);
+      
+      if (user.accessLevel !== 'ADMIN') {
+        setError('Acceso denegado. Se requieren permisos de administrador.');
+        setLoading(false);
+        return;
+      }
+      
       AuthService.saveSession(user, token);
       window.location.reload();
     } catch {
       setError('Credenciales incorrectas. Intenta de nuevo.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await loginWithGoogle();
-    } catch {
-      setError('No se pudo iniciar sesión con Google.');
     } finally {
       setLoading(false);
     }
@@ -187,20 +171,7 @@ export function Login() {
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Bienvenido de nuevo</h1>
                 <p className="text-gray-500">Inicia sesión en tu panel de administración</p>
               </div>
-              <button
-                onClick={handleGoogle}
-                disabled={loading}
-                className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 text-gray-700 py-3.5 rounded-2xl font-semibold hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 shadow-sm disabled:opacity-50 mb-6"
-              >
-                <GoogleIcon />
-                Continuar con Google
-              </button>
 
-              <div className="relative flex items-center gap-4 mb-6">
-                <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-sm text-gray-400 font-medium">o con tu correo</span>
-                <div className="flex-1 h-px bg-gray-200" />
-              </div>
               <form onSubmit={handleLogin} className="space-y-5">
                 {error && (
                   <div className="flex items-center gap-3 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-600 text-sm">
