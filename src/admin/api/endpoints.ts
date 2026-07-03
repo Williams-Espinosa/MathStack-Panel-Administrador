@@ -9,21 +9,21 @@ export const authEndpoints = {
 };
 
 export const dashboardEndpoints = {
-  getStats: `${API_BASE_URL}/dashboard/stats`,
-  getActiveUsers: `${API_BASE_URL}/dashboard/active-users`,
-  getDifficultyStats: `${API_BASE_URL}/dashboard/difficulty-stats`,
-  getUserGrowth: `${API_BASE_URL}/dashboard/user-growth`,
-  getActivityBySubject: `${API_BASE_URL}/dashboard/activity-by-subject`,
+  getStats: `${API_BASE_URL}/admin/dashboard/stats`,
+  getActiveUsers: `${API_BASE_URL}/admin/dashboard/active-users`,
+  getDifficultyStats: `${API_BASE_URL}/admin/dashboard/difficulty-stats`,
+  getUserGrowth: `${API_BASE_URL}/admin/dashboard/user-growth`,
+  getActivityBySubject: `${API_BASE_URL}/admin/dashboard/activity-by-subject`,
 };
 
 export const userEndpoints = {
-  getAll: `${API_BASE_URL}/users`,
-  getById: (id: string) => `${API_BASE_URL}/users/${id}`,
-  updateCoins: (id: string) => `${API_BASE_URL}/users/${id}/coins`,
-  updateXP: (id: string) => `${API_BASE_URL}/users/${id}/xp`,
-  getUserActivity: (id: string) => `${API_BASE_URL}/users/${id}/activity`,
-  banUser: (id: string) => `${API_BASE_URL}/users/${id}/ban`,
-  unbanUser: (id: string) => `${API_BASE_URL}/users/${id}/unban`,
+  getAll: `${API_BASE_URL}/admin/users`,
+  getById: (id: string) => `${API_BASE_URL}/admin/users/${id}`,
+  updateCoins: (id: string) => `${API_BASE_URL}/admin/users/${id}/coins`,
+  updateXP: (id: string) => `${API_BASE_URL}/admin/users/${id}/xp`,
+  getUserActivity: (id: string) => `${API_BASE_URL}/admin/users/${id}/activity`,
+  banUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/ban`,
+  unbanUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
 };
 
 export const storeEndpoints = {
@@ -36,29 +36,29 @@ export const storeEndpoints = {
 };
 
 export const challengeEndpoints = {
-  getAll: `${API_BASE_URL}/social/challenges`,
-  getById: (id: string) => `${API_BASE_URL}/social/challenges/${id}`,
-  create: `${API_BASE_URL}/social/challenges`,
-  update: (id: string) => `${API_BASE_URL}/social/challenges/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/social/challenges/${id}`,
-  getParticipants: (id: string) => `${API_BASE_URL}/social/challenges/${id}/participants`,
+  getAll: `${API_BASE_URL}/admin/challenges`,
+  getById: (id: string) => `${API_BASE_URL}/admin/challenges/${id}`,
+  create: `${API_BASE_URL}/admin/challenges`,
+  update: (id: string) => `${API_BASE_URL}/admin/challenges/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/admin/challenges/${id}`,
+  getParticipants: (id: string) => `${API_BASE_URL}/admin/challenges/${id}/participants`,
 };
 
 export const lessonEndpoints = {
-  getAll: `${API_BASE_URL}/academic/lessons`,
-  getById: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
-  create: `${API_BASE_URL}/academic/lessons`,
-  update: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
+  getAll: `${API_BASE_URL}/admin/lessons`,
+  getById: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
+  create: `${API_BASE_URL}/admin/lessons`,
+  update: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
 };
 
 export const exerciseEndpoints = {
-  getAll: `${API_BASE_URL}/academic/exercises`,
-  getById: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
-  create: `${API_BASE_URL}/academic/exercises`,
-  update: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
-  getByLessonId: (lessonId: string) => `${API_BASE_URL}/academic/lessons/${lessonId}/exercises`,
+  getAll: `${API_BASE_URL}/admin/exercises`,
+  getById: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
+  create: `${API_BASE_URL}/admin/exercises`,
+  update: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
+  getByLessonId: (lessonId: string) => `${API_BASE_URL}/admin/lessons/${lessonId}/exercises`,
 };
 
 export const subjectEndpoints = {
@@ -70,27 +70,27 @@ export const subjectEndpoints = {
 };
 
 export const diagnosticEndpoints = {
-  getAll: `${API_BASE_URL}/diagnostics`,
-  getByUserId: (userId: string) => `${API_BASE_URL}/users/${userId}/diagnostics`,
-  create: `${API_BASE_URL}/diagnostics`,
+  getAll: `${API_BASE_URL}/admin/diagnostics`,
+  getByUserId: (userId: string) => `${API_BASE_URL}/admin/users/${userId}/diagnostics`,
+  create: `${API_BASE_URL}/admin/diagnostics`,
 };
 
 export const practiceEndpoints = {
-  getAll: `${API_BASE_URL}/practice`,
-  getByUserId: (userId: string) => `${API_BASE_URL}/practice/users/${userId}`,
+  getAll: `${API_BASE_URL}/admin/practice-sessions`,
+  getByUserId: (userId: string) => `${API_BASE_URL}/admin/practice-sessions/users/${userId}`,
 };
 
 export const avatarEndpoints = {
-  generate: `${API_BASE_URL}/avatars/generate`,
-  getAll: `${API_BASE_URL}/avatars`,
-  getById: (id: string) => `${API_BASE_URL}/avatars/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/avatars/${id}`,
+  generate: `${API_BASE_URL}/admin/avatars/generate`,
+  getAll: `${API_BASE_URL}/admin/avatars`,
+  getById: (id: string) => `${API_BASE_URL}/admin/avatars/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/admin/avatars/${id}`,
 };
 
 export const statsEndpoints = {
-  getOverview: `${API_BASE_URL}/stats/overview`,
-  getUserStats: `${API_BASE_URL}/stats/users`,
-  getChallengeStats: `${API_BASE_URL}/stats/challenges`,
-  getRevenueStats: `${API_BASE_URL}/stats/revenue`,
-  getEngagementStats: `${API_BASE_URL}/stats/engagement`,
+  getOverview: `${API_BASE_URL}/admin/stats/overview`,
+  getUserStats: `${API_BASE_URL}/admin/stats/users`,
+  getChallengeStats: `${API_BASE_URL}/admin/stats/challenges`,
+  getRevenueStats: `${API_BASE_URL}/admin/stats/revenue`,
+  getEngagementStats: `${API_BASE_URL}/admin/stats/engagement`,
 };
