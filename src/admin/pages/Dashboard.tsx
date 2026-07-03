@@ -122,9 +122,9 @@ export function Dashboard() {
     );
   }
 
-  const activeRate = Math.round((stats.activeUsers / stats.totalUsers) * 100);
-  const lessonRate = Math.round((stats.completedLessons / stats.totalLessons) * 100);
-  const challengeRate = Math.round((stats.activeChallenges / stats.totalChallenges) * 100);
+  const activeRate = stats.totalUsers > 0 ? Math.round((stats.activeUsers / stats.totalUsers) * 100) : 0;
+  const lessonRate = stats.totalLessons > 0 ? Math.round((stats.completedLessons / stats.totalLessons) * 100) : 0;
+  const challengeRate = stats.totalChallenges > 0 ? Math.round((stats.activeChallenges / stats.totalChallenges) * 100) : 0;
 
   const row1: MetricCardProps[] = [
     {

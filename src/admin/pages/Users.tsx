@@ -25,26 +25,34 @@ import {
 } from 'lucide-react';
 
 function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }) {
-  const joinDate = new Date(user.joinedAt).toLocaleDateString('es-ES', {
+  const joinDate = new Date(user.joinedAt || (user as any).createdAt || Date.now()).toLocaleDateString('es-ES', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
   const lastActive = user.lastActive
     ? new Date(user.lastActive).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
     : 'Nunca';
 
-  const xpForNextLevel = (user.level + 1) * 500;
-  const xpProgress = Math.min(100, Math.round((user.xp / xpForNextLevel) * 100));
+  const userLevel = user.level || 0;
+  const userXp = user.xp || 0;
+  const userCoins = user.coins || 0;
+  const userCompletedLessons = user.completedLessons || 0;
+  const userCurrentStreak = user.currentStreak || 0;
+  const userBestStreak = user.bestStreak || 0;
+  const userMinutesPracticed = user.minutesPracticed || 0;
+
+  const xpForNextLevel = (userLevel + 1) * 500;
+  const xpProgress = Math.min(100, Math.round((userXp / xpForNextLevel) * 100));
 
   const avatarLetter = user.username.charAt(0).toUpperCase();
 
   const stats = [
-    { label: 'Nivel actual', value: user.level, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: 'XP Total', value: user.xp.toLocaleString(), icon: Zap, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Math Coins', value: user.coins.toLocaleString(), icon: CircleDollarSign, color: 'text-yellow-500', bg: 'bg-yellow-50' },
-    { label: 'Lecciones', value: user.completedLessons, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Racha actual', value: `${user.currentStreak} días`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: 'Mejor racha', value: `${user.bestStreak} días`, icon: Trophy, color: 'text-green-500', bg: 'bg-green-50' },
-    { label: 'Min. practicados', value: user.minutesPracticed.toLocaleString(), icon: Clock, color: 'text-cyan-500', bg: 'bg-cyan-50' },
+    { label: 'Nivel actual', value: userLevel, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: 'XP Total', value: userXp.toLocaleString(), icon: Zap, color: 'text-purple-500', bg: 'bg-purple-50' },
+    { label: 'Math Coins', value: userCoins.toLocaleString(), icon: CircleDollarSign, color: 'text-yellow-500', bg: 'bg-yellow-50' },
+    { label: 'Lecciones', value: userCompletedLessons, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Racha actual', value: `${userCurrentStreak} días`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: 'Mejor racha', value: `${userBestStreak} días`, icon: Trophy, color: 'text-green-500', bg: 'bg-green-50' },
+    { label: 'Min. practicados', value: userMinutesPracticed.toLocaleString(), icon: Clock, color: 'text-cyan-500', bg: 'bg-cyan-50' },
     { label: 'Estado', value: user.isActive ? 'Activo' : 'Inactivo', icon: Activity, color: user.isActive ? 'text-green-500' : 'text-gray-400', bg: user.isActive ? 'bg-green-50' : 'bg-gray-50' },
   ];
 
@@ -100,7 +108,7 @@ function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }
 
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-gray-500">Nivel {user.level + 1}</span>
+              <span className="text-xs font-semibold text-gray-500">Nivel {userLevel + 1}</span>
               <span className="text-xs font-bold text-[#2563EB]">{xpProgress}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -156,7 +164,6 @@ function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }
   );
 }
 
-// ── Main component ────────────────────────────────────────────────
 export function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -219,8 +226,8 @@ export function Users() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Usuarios Totales', value: users.length, icon: UsersIcon, color: '#2563EB', bg: 'bg-blue-50' },
-          { label: 'Usuarios Activos', value: users.filter((u) => u.isActive).length, icon: Zap, color: '#22C55E', bg: 'bg-green-50' },
-          { label: 'Nivel Promedio', value: users.length ? Math.round(users.reduce((s, u) => s + u.level, 0) / users.length) : 0, icon: TrendingUp, color: '#F59E0B', bg: 'bg-amber-50' },
+          { label: 'Usuarios Activos', value: users.filter((u) => u.isActive || true).length, icon: Zap, color: '#22C55E', bg: 'bg-green-50' },
+          { label: 'Nivel Promedio', value: users.length ? Math.round(users.reduce((s, u) => s + (u.level || 0), 0) / users.length) : 0, icon: TrendingUp, color: '#F59E0B', bg: 'bg-amber-50' },
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
@@ -252,7 +259,6 @@ export function Users() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -284,30 +290,29 @@ export function Users() {
                   </td>
                   <td className="py-3.5 px-4 text-center">
                     <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-amber-50 text-amber-600 font-bold text-sm">
-                      {user.level}
+                      {user.level || 0}
                     </span>
                   </td>
                   <td className="py-3.5 px-4 text-center text-sm font-semibold text-gray-700">
-                    {user.xp.toLocaleString()}
+                    {(user.xp || 0).toLocaleString()}
                   </td>
                   <td className="py-3.5 px-4 text-center">
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-yellow-50 text-yellow-700 font-bold text-sm">
                       <CircleDollarSign className="w-3.5 h-3.5" />
-                      {user.coins}
+                      {user.coins || 0}
                     </span>
                   </td>
                   <td className="py-3.5 px-4 text-center">
-                    <span className="text-sm font-semibold text-gray-700">{user.currentStreak}d</span>
-                    <p className="text-xs text-gray-400">Máx: {user.bestStreak}</p>
+                    <span className="text-sm font-semibold text-gray-700">{user.currentStreak || 0}d</span>
+                    <p className="text-xs text-gray-400">Máx: {user.bestStreak || 0}</p>
                   </td>
                   <td className="py-3.5 px-4 text-center text-sm font-semibold text-gray-700">
-                    {user.completedLessons}
+                    {user.completedLessons || 0}
                   </td>
                   <td className="py-3.5 px-4 text-center">
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${user.isActive ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
-                      }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-gray-400'}`} />
-                      {user.isActive ? 'Activo' : 'Inactivo'}
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-600`}>
+                      <span className={`w-1.5 h-1.5 rounded-full bg-green-500`} />
+                      Activo
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
@@ -342,12 +347,10 @@ export function Users() {
         </div>
       </div>
 
-      {/* Profile Modal */}
       {showProfile && profileUser && (
         <UserProfileModal user={profileUser} onClose={() => { setShowProfile(false); setProfileUser(null); }} />
       )}
 
-      {/* Coin Modal */}
       {showCoinModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(6px)' }}>
           <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-7">

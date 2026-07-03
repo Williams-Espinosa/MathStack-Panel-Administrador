@@ -32,6 +32,7 @@ export interface User {
   joinedAt: string;
   lastActive: string;
   isActive: boolean;
+  xp: number;
 }
 
 export interface Subject {
@@ -47,6 +48,8 @@ export interface DifficultyStats {
   totalAttempts: number;
   failureRate: number;
   averageDeficiencyScore: number;
+  averageScore: number;
+  usersStruggling: number;
 }
 
 export interface DashboardStats {
