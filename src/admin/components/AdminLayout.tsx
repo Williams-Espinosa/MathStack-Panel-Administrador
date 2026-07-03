@@ -62,8 +62,8 @@ export function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutPr
     window.location.reload();
   };
 
-  const initials = user?.name
-    ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+  const initials = user?.username
+    ? user.username.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
     : 'AD';
 
   return (
@@ -136,7 +136,7 @@ export function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutPr
 
           <div
             className="w-12 h-12 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center text-white text-base font-bold cursor-pointer ring-2 ring-white shadow-md"
-            title={user?.name || 'Admin'}
+            title={user?.username || 'Admin'}
           >
             {initials}
           </div>
@@ -188,7 +188,7 @@ export function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutPr
                   {initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-gray-900 truncate">{user?.name || 'Admin'}</p>
+                  <p className="text-base font-semibold text-gray-900 truncate">{user?.username || 'Admin'}</p>
                   <p className="text-sm text-gray-500 truncate">{user?.email}</p>
                 </div>
               </div>
@@ -216,7 +216,7 @@ export function AdminLayout({ children, currentPage, onNavigate }: AdminLayoutPr
             </button>
             <div>
               <h2 className="text-xl font-bold text-gray-900 leading-tight">
-                {getGreeting()}, {user?.name?.split(' ')[0] || 'Admin'}!
+                {getGreeting()}, {user?.username?.split(' ')[0] || 'Admin'}!
               </h2>
               <p className="text-sm text-gray-500 font-medium leading-tight">{pageNames[currentPage] || 'MathStack'}</p>
             </div>
