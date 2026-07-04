@@ -104,12 +104,18 @@ export function Stats() {
     { name: 'Dom', sessions: 650, completions: 470, streaks: 390 },
   ];
 
-  const performanceData = stats.difficultyStats.map((stat) => ({
-    subject: stat.subjectName,
-    'Tasa Éxito': Number(((1 - (stat.failureRate || 0)) * 100).toFixed(1)),
-    'Promedio': Number((stat.averageScore || 0).toFixed(1)),
-    fullMark: 100,
-  }));
+  const performanceData = stats.difficultyStats.length > 0 
+    ? stats.difficultyStats.map((stat) => ({
+        subject: stat.subjectName,
+        'Tasa Éxito': Number(((1 - (stat.failureRate || 0)) * 100).toFixed(1)),
+        'Promedio': Number((stat.averageScore || 0).toFixed(1)),
+        fullMark: 100,
+      }))
+    : [
+        { subject: 'Geometría', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+        { subject: 'Álgebra', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+        { subject: 'Aritmética', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+      ];
 
   const retentionData = [
     { week: 'Semana 1', retention: 92, active: 850 },
