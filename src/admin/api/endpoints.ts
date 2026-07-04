@@ -48,19 +48,19 @@ export const challengeEndpoints = {
 
 export const lessonEndpoints = {
   getAll: `${API_BASE_URL}/admin/lessons`,
-  getById: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
-  create: `${API_BASE_URL}/admin/lessons`,
-  update: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/admin/lessons/${id}`,
+  getById: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
+  create: `${API_BASE_URL}/academic/lessons`,
+  update: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/academic/lessons/${id}`,
 };
 
 export const exerciseEndpoints = {
   getAll: `${API_BASE_URL}/admin/exercises`,
-  getById: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
-  create: `${API_BASE_URL}/admin/exercises`,
-  update: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
-  delete: (id: string) => `${API_BASE_URL}/admin/exercises/${id}`,
-  getByLessonId: (lessonId: string) => `${API_BASE_URL}/admin/lessons/${lessonId}/exercises`,
+  getById: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
+  create: `${API_BASE_URL}/academic/exercises`,
+  update: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
+  delete: (id: string) => `${API_BASE_URL}/academic/exercises/${id}`,
+  getByLessonId: (lessonId: string) => `${API_BASE_URL}/academic/lessons/${lessonId}/exercises`,
 };
 
 export const subjectEndpoints = {
