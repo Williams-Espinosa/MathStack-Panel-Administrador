@@ -106,8 +106,8 @@ export function Stats() {
 
   const performanceData = stats.difficultyStats.map((stat) => ({
     subject: stat.subjectName,
-    'Tasa Éxito': ((1 - stat.failureRate) * 100).toFixed(1),
-    'Promedio': stat.averageScore,
+    'Tasa Éxito': Number(((1 - (stat.failureRate || 0)) * 100).toFixed(1)),
+    'Promedio': Number((stat.averageScore || 0).toFixed(1)),
     fullMark: 100,
   }));
 
@@ -152,7 +152,7 @@ export function Stats() {
               <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
             <h3 className="text-5xl font-bold text-blue-900 mb-1">
-              {((stats.activeUsers / stats.totalUsers) * 100).toFixed(1)}%
+              {stats.totalUsers ? ((stats.activeUsers / stats.totalUsers) * 100).toFixed(1) : '0.0'}%
             </h3>
           </div>
         </div>
@@ -165,7 +165,7 @@ export function Stats() {
               <Target className="w-5 h-5 text-green-600" />
             </div>
             <h3 className="text-5xl font-bold text-green-900 mb-1">
-              {((stats.completedLessons / (stats.totalLessons * stats.totalUsers)) * 100).toFixed(1)}%
+              {stats.totalLessons && stats.totalUsers ? ((stats.completedLessons / (stats.totalLessons * stats.totalUsers)) * 100).toFixed(1) : '0.0'}%
             </h3>
           </div>
         </div>
@@ -178,7 +178,7 @@ export function Stats() {
               <Trophy className="w-5 h-5 text-cyan-600" />
             </div>
             <h3 className="text-5xl font-bold text-cyan-900 mb-1">
-              {((stats.activeChallenges / stats.totalChallenges) * 100).toFixed(0)}%
+              {stats.totalChallenges ? ((stats.activeChallenges / stats.totalChallenges) * 100).toFixed(0) : '0'}%
             </h3>
           </div>
         </div>
