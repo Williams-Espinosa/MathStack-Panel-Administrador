@@ -8,6 +8,11 @@ export const authEndpoints = {
   verifyToken: `${API_BASE_URL}/auth/verify`,
 };
 
+export const adminSettingsEndpoints = {
+  get: `${API_BASE_URL}/admin/settings`,
+  update: `${API_BASE_URL}/admin/settings`,
+};
+
 export const dashboardEndpoints = {
   getStats: `${API_BASE_URL}/admin/dashboard/stats`,
   getActiveUsers: `${API_BASE_URL}/admin/dashboard/active-users`,

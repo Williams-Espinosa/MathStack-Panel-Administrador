@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { User, Bell, Shield, Save, Key, Eye, EyeOff } from 'lucide-react';
 import { AuthService } from '../services/authService';
+import { SettingsService } from '../services/settingsService';
 import type { AdminUser } from '../models/types';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -21,43 +22,41 @@ export function Settings() {
   const [showPassword, setShowPassword] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const [settings, setSettings] = useState(() => {
-    const savedSettings = localStorage.getItem('admin_settings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        return {
-          adminName: user?.username || parsed.adminName || 'Admin User',
-          adminEmail: user?.email || parsed.adminEmail || 'admin@mathstack.com',
-          emailNotifications: parsed.emailNotifications ?? true,
-          challengeAlerts: parsed.challengeAlerts ?? true,
-          newPassword: '',
-          confirmPassword: '',
-        };
-      } catch (e) {
-      }
-    }
-    return {
-      adminName: user?.username || 'Admin User',
-      adminEmail: user?.email || 'admin@mathstack.com',
-      emailNotifications: true,
-      challengeAlerts: true,
-      newPassword: '',
-      confirmPassword: '',
-    };
+  const [settings, setSettings] = useState({
+    adminName: user?.username || 'Admin User',
+    adminEmail: user?.email || 'admin@mathstack.com',
+    emailNotifications: true,
+    challengeAlerts: true,
+    newPassword: '',
+    confirmPassword: '',
   });
 
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    if (user && !localStorage.getItem('admin_settings')) {
+    SettingsService.getSettings()
+      .then((serverSettings) => {
+        setSettings((prev) => ({
+          ...prev,
+          emailNotifications: serverSettings.emailNotifications,
+          challengeAlerts: serverSettings.challengeAlerts,
+        }));
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (user && isLoading) {
       setSettings(s => ({
         ...s,
         adminName: user.username,
         adminEmail: user.email,
       }));
     }
-  }, [user]);
+  }, [user, isLoading]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (settings.newPassword || settings.confirmPassword) {
       if (settings.newPassword !== settings.confirmPassword) {
         alert('Las contraseñas no coinciden.');
@@ -65,36 +64,46 @@ export function Settings() {
       }
     }
 
-    const settingsToSave = {
-      adminName: settings.adminName,
-      adminEmail: settings.adminEmail,
-      emailNotifications: settings.emailNotifications,
-      challengeAlerts: settings.challengeAlerts,
-    };
-    localStorage.setItem('admin_settings', JSON.stringify(settingsToSave));
+    try {
+      await SettingsService.updateSettings({
+        emailNotifications: settings.emailNotifications,
+        challengeAlerts: settings.challengeAlerts,
+      });
 
-    if (user) {
-      const updatedUser: AdminUser = {
-        ...user,
-        username: settings.adminName,
-        email: settings.adminEmail,
-      };
-      const token = localStorage.getItem('admin_token') || '';
-      AuthService.saveSession(updatedUser, token);
+      if (user) {
+        const updatedUser: AdminUser = {
+          ...user,
+          username: settings.adminName,
+          email: settings.adminEmail,
+        };
+        const token = localStorage.getItem('admin_token') || '';
+        AuthService.saveSession(updatedUser, token);
+      }
+
+      setSettings(s => ({
+        ...s,
+        newPassword: '',
+        confirmPassword: '',
+      }));
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('Error al guardar la configuración');
     }
-
-    setSettings(s => ({
-      ...s,
-      newPassword: '',
-      confirmPassword: '',
-    }));
-
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
   };
 
   const initials = settings.adminName
     .split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-2xl space-y-6">
