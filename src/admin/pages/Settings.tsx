@@ -21,7 +21,6 @@ export function Settings() {
   const [showPassword, setShowPassword] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Load initial settings from localStorage or defaults
   const [settings, setSettings] = useState(() => {
     const savedSettings = localStorage.getItem('admin_settings');
     if (savedSettings) {
@@ -36,7 +35,6 @@ export function Settings() {
           confirmPassword: '',
         };
       } catch (e) {
-        // ignore
       }
     }
     return {
@@ -49,7 +47,6 @@ export function Settings() {
     };
   });
 
-  // Ensure name and email sync with auth state if not modified yet
   useEffect(() => {
     if (user && !localStorage.getItem('admin_settings')) {
       setSettings(s => ({
@@ -61,7 +58,6 @@ export function Settings() {
   }, [user]);
 
   const handleSave = () => {
-    // Basic validation for password
     if (settings.newPassword || settings.confirmPassword) {
       if (settings.newPassword !== settings.confirmPassword) {
         alert('Las contraseñas no coinciden.');
@@ -69,7 +65,6 @@ export function Settings() {
       }
     }
 
-    // Save to localStorage
     const settingsToSave = {
       adminName: settings.adminName,
       adminEmail: settings.adminEmail,
@@ -78,7 +73,6 @@ export function Settings() {
     };
     localStorage.setItem('admin_settings', JSON.stringify(settingsToSave));
 
-    // Update current user in localStorage so header name updates on reload
     if (user) {
       const updatedUser: AdminUser = {
         ...user,
@@ -89,7 +83,6 @@ export function Settings() {
       AuthService.saveSession(updatedUser, token);
     }
 
-    // Reset password fields after save
     setSettings(s => ({
       ...s,
       newPassword: '',
@@ -127,8 +120,7 @@ export function Settings() {
       </div>
 
       <div className="space-y-8">
-        
-        {/* PROFILE SECTION */}
+
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <User className="w-5 h-5 text-[#2563EB]" />
@@ -177,13 +169,12 @@ export function Settings() {
           </div>
         </div>
 
-        {/* NOTIFICATIONS SECTION */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <Bell className="w-5 h-5 text-[#2563EB]" />
             <h2 className="text-base font-bold text-gray-900">Notificaciones</h2>
           </div>
-          
+
           <div className="divide-y divide-gray-50 border border-gray-100 rounded-xl">
             {[
               { key: 'emailNotifications', label: 'Notificaciones por Email', desc: 'Recibe alertas importantes por correo' },
@@ -203,13 +194,12 @@ export function Settings() {
           </div>
         </div>
 
-        {/* SECURITY SECTION */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <Shield className="w-5 h-5 text-[#2563EB]" />
             <h2 className="text-base font-bold text-gray-900">Seguridad</h2>
           </div>
-          
+
           <div className="border border-gray-100 rounded-xl px-6 py-5 space-y-4">
             <div className="flex items-center gap-2 mb-1">
               <Key className="w-4 h-4 text-[#2563EB]" />
