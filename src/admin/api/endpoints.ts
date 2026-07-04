@@ -69,6 +69,10 @@ export const subjectEndpoints = {
   delete: (id: number) => `${API_BASE_URL}/academic/subjects/${id}`,
 };
 
+export const lessonTypeEndpoints = {
+  getAll: `${API_BASE_URL}/academic/lesson-types`,
+};
+
 export const diagnosticEndpoints = {
   getAll: `${API_BASE_URL}/admin/diagnostics`,
   getByUserId: (userId: string) => `${API_BASE_URL}/admin/users/${userId}/diagnostics`,

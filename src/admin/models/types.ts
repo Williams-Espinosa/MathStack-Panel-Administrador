@@ -138,7 +138,11 @@ export interface LearningMaterial {
   contentUrl?: string;
   content?: string;
 
+  lessonId?: string;
+
   exerciseCount?: number;
+  xpReward?: number;
+  estimatedTime?: number;
 
   createdAt?: string;
   updatedAt?: string;

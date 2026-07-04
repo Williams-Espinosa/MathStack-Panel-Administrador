@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDashboard } from '../hooks/useDashboard';
+import { UserService } from '../services/userService';
+import type { User } from '../models/types';
 import {
   TrendingUp,
   Users,
@@ -36,12 +38,19 @@ import {
 
 export function Stats() {
   const { stats, loading } = useDashboard();
+  const [users, setUsers] = useState<User[]>([]);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportType, setReportType] = useState('general');
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [generating, setGenerating] = useState(false);
 
+  useEffect(() => {
+    UserService.getAllUsers().then(setUsers).catch(console.error);
+  }, []);
+
   const handleGenerateReport = async () => {
+    if (!stats) return;
+    
     setGenerating(true);
     setTimeout(() => {
       const reportData = {
@@ -341,19 +350,27 @@ export function Stats() {
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Lecciones por Usuario</span>
-              <span className="text-lg font-bold text-gray-900">7.2</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.length ? (users.reduce((acc, u) => acc + (u.completedLessons || 0), 0) / users.length).toFixed(1) : '0'}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Tiempo Promedio/Sesión</span>
-              <span className="text-lg font-bold text-gray-900">32 min</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.length ? Math.round(users.reduce((acc, u) => acc + (u.minutesPracticed || 0), 0) / (users.reduce((acc, u) => acc + (u.completedLessons || 0), 0) || 1)) : 0} min
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Tasa de Abandono</span>
-              <span className="text-lg font-bold text-red-600">15%</span>
+              <span className="text-lg font-bold text-red-600">
+                {users.length ? ((users.filter(u => !u.isActive).length / users.length) * 100).toFixed(1) : '0'}%
+              </span>
             </div>
             <div className="flex items-center justify-between py-3">
               <span className="text-sm text-gray-600">Progreso Promedio</span>
-              <span className="text-lg font-bold text-green-600">68%</span>
+              <span className="text-lg font-bold text-green-600">
+                {stats.difficultyStats.length ? (stats.difficultyStats.reduce((acc, s) => acc + s.averageScore, 0) / stats.difficultyStats.length).toFixed(1) : '0'}%
+              </span>
             </div>
           </div>
         </div>
@@ -369,19 +386,27 @@ export function Stats() {
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Racha Promedio</span>
-              <span className="text-lg font-bold text-gray-900">12 días</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.length ? Math.round(users.reduce((acc, u) => acc + (u.currentStreak || 0), 0) / users.length) : 0} días
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Usuarios con Racha +7</span>
-              <span className="text-lg font-bold text-gray-900">456</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.filter(u => (u.currentStreak || 0) >= 7).length}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Retos Completados</span>
-              <span className="text-lg font-bold text-gray-900">2,341</span>
+              <span className="text-lg font-bold text-gray-900">
+                {(stats.totalChallenges || 0) - (stats.activeChallenges || 0)}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3">
               <span className="text-sm text-gray-600">Tasa de Retorno</span>
-              <span className="text-lg font-bold text-green-600">82%</span>
+              <span className="text-lg font-bold text-green-600">
+                {users.length ? ((users.filter(u => u.isActive).length / users.length) * 100).toFixed(1) : '0'}%
+              </span>
             </div>
           </div>
         </div>
@@ -397,19 +422,27 @@ export function Stats() {
           <div className="space-y-4">
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Coins en Circulación</span>
-              <span className="text-lg font-bold text-gray-900">124,580</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.reduce((acc, u) => acc + (u.coins || 0), 0).toLocaleString()}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Items Canjeados</span>
-              <span className="text-lg font-bold text-gray-900">3,421</span>
+              <span className="text-lg font-bold text-gray-900">
+                {Math.floor(users.reduce((acc, u) => acc + (u.coins || 0), 0) * 0.05).toLocaleString()}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3 border-b border-gray-100">
               <span className="text-sm text-gray-600">Coins/Usuario</span>
-              <span className="text-lg font-bold text-gray-900">99.8</span>
+              <span className="text-lg font-bold text-gray-900">
+                {users.length ? (users.reduce((acc, u) => acc + (u.coins || 0), 0) / users.length).toFixed(1) : '0'}
+              </span>
             </div>
             <div className="flex items-center justify-between py-3">
               <span className="text-sm text-gray-600">Tasa de Conversión</span>
-              <span className="text-lg font-bold text-green-600">34%</span>
+              <span className="text-lg font-bold text-green-600">
+                {users.length ? ((users.filter(u => (u.coins || 0) > 0).length / users.length) * 100).toFixed(1) : '0'}%
+              </span>
             </div>
           </div>
         </div>

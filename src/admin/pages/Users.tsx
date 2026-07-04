@@ -24,7 +24,15 @@ import {
   Mail,
 } from 'lucide-react';
 
-function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }) {
+function UserProfileModal({ 
+  user, 
+  onClose,
+  onUpdateCoins
+}: { 
+  user: User; 
+  onClose: () => void;
+  onUpdateCoins?: (operation: 'add' | 'remove') => void;
+}) {
   const joinDate = new Date(user.joinedAt || (user as any).createdAt || Date.now()).toLocaleDateString('es-ES', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -48,29 +56,27 @@ function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }
   const stats = [
     { label: 'Nivel actual', value: userLevel, icon: Star, color: 'text-amber-500', bg: 'bg-amber-50' },
     { label: 'XP Total', value: userXp.toLocaleString(), icon: Zap, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Math Coins', value: userCoins.toLocaleString(), icon: CircleDollarSign, color: 'text-yellow-500', bg: 'bg-yellow-50' },
     { label: 'Lecciones', value: userCompletedLessons, icon: BookOpen, color: 'text-blue-500', bg: 'bg-blue-50' },
     { label: 'Racha actual', value: `${userCurrentStreak} días`, icon: Flame, color: 'text-orange-500', bg: 'bg-orange-50' },
     { label: 'Mejor racha', value: `${userBestStreak} días`, icon: Trophy, color: 'text-green-500', bg: 'bg-green-50' },
     { label: 'Min. practicados', value: userMinutesPracticed.toLocaleString(), icon: Clock, color: 'text-cyan-500', bg: 'bg-cyan-50' },
-    { label: 'Estado', value: user.isActive ? 'Activo' : 'Inactivo', icon: Activity, color: user.isActive ? 'text-green-500' : 'text-gray-400', bg: user.isActive ? 'bg-green-50' : 'bg-gray-50' },
   ];
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(15,23,42,0.55)', backdropFilter: 'blur(6px)' }}
+      style={{ background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(8px)' }}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-3xl shadow-2xl w-72 overflow-hidden animate-[fadeIn_0.2s_ease-out]"
+        className="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-[fadeIn_0.2s_ease-out] border border-white/20"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative h-24 bg-gradient-to-br from-[#1e3a8a] via-[#2563EB] to-[#60a5fa]">
-          <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+        <div className="relative h-32 bg-gradient-to-br from-[#1e3a8a] via-[#2563EB] to-[#3b82f6]">
+          <svg className="absolute inset-0 w-full h-full opacity-20 mix-blend-overlay" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="pg" width="32" height="32" patternUnits="userSpaceOnUse">
-                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="white" strokeWidth="0.5" />
+              <pattern id="pg" width="24" height="24" patternUnits="userSpaceOnUse">
+                <path d="M 24 0 L 0 0 0 24" fill="none" stroke="white" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#pg)" />
@@ -78,80 +84,110 @@ function UserProfileModal({ user, onClose }: { user: User; onClose: () => void }
 
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-xl bg-white/20 hover:bg-white/30 text-white transition-colors"
+            className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md transition-all"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
 
           <div className="absolute top-4 left-4">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${user.isActive ? 'bg-green-400/20 text-green-200 border border-green-400/30' : 'bg-gray-400/20 text-gray-200 border border-gray-400/30'
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm backdrop-blur-md ${user.isActive ? 'bg-green-500/20 text-green-100 border border-green-400/30' : 'bg-gray-500/20 text-gray-100 border border-gray-400/30'
               }`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
+              <span className={`w-1.5 h-1.5 rounded-full shadow-sm ${user.isActive ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
               {user.isActive ? 'Activo' : 'Inactivo'}
             </span>
           </div>
         </div>
 
-        <div className="px-5 pb-5">
-          <div className="flex items-end gap-3 -mt-8 mb-3">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center text-white text-xl font-bold shadow-xl ring-4 ring-white flex-shrink-0">
+        <div className="px-6 pb-6">
+          <div className="flex flex-col items-center -mt-12 mb-5">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1e40af] flex items-center justify-center text-white text-4xl font-extrabold shadow-xl ring-4 ring-white mb-3">
               {avatarLetter}
             </div>
-            <div className="pb-1 min-w-0">
-              <h2 className="text-base font-bold text-gray-900 truncate">{user.username}</h2>
-              <div className="flex items-center gap-1.5 text-gray-500 text-xs">
-                <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-                <span className="truncate">{user.email}</span>
-              </div>
+            <h2 className="text-xl font-bold text-gray-900 text-center w-full truncate">{user.username}</h2>
+            <div className="flex items-center justify-center gap-1.5 text-gray-500 text-sm mt-1">
+              <Mail className="w-4 h-4" />
+              <span className="truncate">{user.email}</span>
             </div>
           </div>
 
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-semibold text-gray-500">Nivel {userLevel + 1}</span>
-              <span className="text-xs font-bold text-[#2563EB]">{xpProgress}%</span>
+          <div className="bg-gray-50 rounded-2xl p-4 mb-5 border border-gray-100">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-bold text-gray-700">Nivel {userLevel + 1}</span>
+              <span className="text-sm font-bold text-[#2563EB]">{xpProgress}%</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#60a5fa]"
+                className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#60a5fa] transition-all duration-500 ease-out"
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
+            <p className="text-xs text-center text-gray-500 mt-2 font-medium">{userXp.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP</p>
           </div>
 
-          <div className="grid grid-cols-4 gap-1.5 mb-5">
+          {/* Math Coins Section */}
+          <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-4 mb-5 border border-yellow-100/50 shadow-sm flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shadow-inner">
+                <CircleDollarSign className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-yellow-800 uppercase tracking-wide">Math Coins</p>
+                <p className="text-xl font-black text-yellow-600">{userCoins.toLocaleString()}</p>
+              </div>
+            </div>
+            {onUpdateCoins && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onUpdateCoins('remove')}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-white text-gray-600 hover:text-red-600 hover:bg-red-50 shadow-sm border border-yellow-200 transition-colors"
+                  title="Quitar Coins"
+                >
+                  <Minus className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => onUpdateCoins('add')}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl bg-white text-gray-600 hover:text-green-600 hover:bg-green-50 shadow-sm border border-yellow-200 transition-colors"
+                  title="Agregar Coins"
+                >
+                  <Plus className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mb-6">
             {stats.map(({ label, value, icon: Icon, color, bg }) => (
-              <div key={label} className={`${bg} rounded-xl p-2 flex flex-col items-center text-center`}>
-                <Icon className={`w-3.5 h-3.5 ${color} mb-0.5`} />
-                <p className="text-xs font-bold text-gray-900 leading-tight">{value}</p>
-                <p className="text-[9px] text-gray-500 font-medium leading-tight mt-0.5">{label}</p>
+              <div key={label} className={`${bg} rounded-2xl p-3 flex flex-col items-center text-center transition-transform hover:scale-105 duration-200 cursor-default border border-transparent hover:border-black/5`}>
+                <Icon className={`w-5 h-5 ${color} mb-1.5`} />
+                <p className="text-sm font-bold text-gray-900 leading-tight">{value}</p>
+                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1">{label}</p>
               </div>
             ))}
           </div>
 
           {/* Info rows */}
-          <div className="border-t border-gray-100 pt-3 space-y-3 mb-4">
+          <div className="space-y-3 bg-gray-50 rounded-2xl p-4 border border-gray-100">
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-gray-500">
-                <Calendar className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-gray-600 font-medium">
+                <Calendar className="w-4 h-4 text-gray-400" />
                 <span>Miembro desde</span>
               </div>
-              <span className="font-semibold text-gray-800">{joinDate}</span>
+              <span className="font-bold text-gray-900">{joinDate}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2 text-gray-500">
-                <Activity className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-gray-600 font-medium">
+                <Activity className="w-4 h-4 text-gray-400" />
                 <span>Última actividad</span>
               </div>
-              <span className="font-semibold text-gray-800">{lastActive}</span>
+              <span className="font-bold text-gray-900">{lastActive}</span>
             </div>
             {user.lastPracticeDate && (
               <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <Clock className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-gray-600 font-medium">
+                  <Clock className="w-4 h-4 text-gray-400" />
                   <span>Última práctica</span>
                 </div>
-                <span className="font-semibold text-gray-800">
+                <span className="font-bold text-gray-900">
                   {new Date(user.lastPracticeDate).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
@@ -348,7 +384,16 @@ export function Users() {
       </div>
 
       {showProfile && profileUser && (
-        <UserProfileModal user={profileUser} onClose={() => { setShowProfile(false); setProfileUser(null); }} />
+        <UserProfileModal 
+          user={profileUser} 
+          onClose={() => { setShowProfile(false); setProfileUser(null); }}
+          onUpdateCoins={(operation) => {
+            setSelectedUser(profileUser);
+            setCoinOperation(operation);
+            setShowCoinModal(true);
+            // Optionally auto-close profile: setShowProfile(false);
+          }}
+        />
       )}
 
       {showCoinModal && selectedUser && (

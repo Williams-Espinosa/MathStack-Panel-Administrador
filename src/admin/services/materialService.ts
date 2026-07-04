@@ -1,8 +1,17 @@
-import { lessonEndpoints, exerciseEndpoints } from '../api/endpoints';
+import { lessonEndpoints, exerciseEndpoints, subjectEndpoints, lessonTypeEndpoints } from '../api/endpoints';
 import { fetchApi } from '../api/apiClient';
-import type { LearningMaterial } from '../models/types';
+import type { LearningMaterial, Subject } from '../models/types';
+import type { LessonTypeRecord } from '../models/database.types';
 
 export class MaterialService {
+  static async getSubjects(): Promise<Subject[]> {
+    return fetchApi<Subject[]>(subjectEndpoints.getAll).catch(() => []);
+  }
+
+  static async getLessonTypes(): Promise<LessonTypeRecord[]> {
+    return fetchApi<LessonTypeRecord[]>(lessonTypeEndpoints.getAll).catch(() => []);
+  }
+
   static async getAllMaterials(): Promise<LearningMaterial[]> {
     try {
       const [lessons, exercises] = await Promise.all([
@@ -29,12 +38,32 @@ export class MaterialService {
     }
   }
 
-  static async createMaterial(material: Omit<LearningMaterial, 'id' | 'createdAt' | 'updatedAt'>): Promise<LearningMaterial> {
-    const endpoint = material.type === 'lesson' ? lessonEndpoints.create : exerciseEndpoints.create;
-    return fetchApi<LearningMaterial>(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(material),
-    });
+  static async createMaterial(material: Partial<LearningMaterial>): Promise<LearningMaterial> {
+    if (material.type === 'exercise') {
+      const payload = {
+        lessonId: material.lessonId,
+        content: material.content,
+        conceptTested: material.title, // using title as concept since concept is missing
+      };
+      const response = await fetchApi<any>(exerciseEndpoints.create, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return { ...material, id: response.id } as LearningMaterial;
+    } else {
+      const payload = {
+        subjectId: material.subjectId,
+        lessonTypeId: material.lessonTypeId || 1, // Fallback if missing
+        title: material.title,
+        difficultyLevel: material.difficultyLevel || 5, // Fallback
+        content: material.content,
+      };
+      const response = await fetchApi<any>(lessonEndpoints.create, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      return { ...material, id: response.id } as LearningMaterial;
+    }
   }
 
   static async updateMaterial(id: string, updates: Partial<LearningMaterial>): Promise<LearningMaterial> {

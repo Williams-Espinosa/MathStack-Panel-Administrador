@@ -1,22 +1,25 @@
 import { useState, useEffect } from 'react';
 import { MaterialService } from '../services/materialService';
-import type { LearningMaterial } from '../models/types';
+import type { LearningMaterial, Subject } from '../models/types';
+import type { LessonTypeRecord } from '../models/database.types';
 import { Plus, Edit, Trash2, BookOpen, FileText, Video, FileSpreadsheet, Clock } from 'lucide-react';
 
 export function Materials() {
   const [materials, setMaterials] = useState<LearningMaterial[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [lessonTypes, setLessonTypes] = useState<LessonTypeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Partial<LearningMaterial>>({
     title: '',
     description: '',
-    subject: 'Algebra',
-    difficulty: 'beginner' as LearningMaterial['difficulty'],
-    type: 'lesson' as LearningMaterial['type'],
+    subjectId: 1,
+    lessonTypeId: 1,
+    difficultyLevel: 1,
+    type: 'lesson',
     content: '',
     contentUrl: '',
-    xpReward: 50,
-    estimatedTime: 30,
+    lessonId: '',
   });
 
   useEffect(() => {
@@ -25,8 +28,21 @@ export function Materials() {
 
   const loadMaterials = async () => {
     setLoading(true);
-    const data = await MaterialService.getAllMaterials();
+    const [data, subjectsData, lessonTypesData] = await Promise.all([
+      MaterialService.getAllMaterials(),
+      MaterialService.getSubjects(),
+      MaterialService.getLessonTypes(),
+    ]);
     setMaterials(data);
+    setSubjects(subjectsData);
+    setLessonTypes(lessonTypesData);
+    
+    if (subjectsData.length > 0) {
+      setFormData(prev => ({ ...prev, subjectId: subjectsData[0].id }));
+    }
+    if (lessonTypesData.length > 0) {
+      setFormData(prev => ({ ...prev, lessonTypeId: lessonTypesData[0].id }));
+    }
     setLoading(false);
   };
 
@@ -40,17 +56,13 @@ export function Materials() {
       const newMaterial = await MaterialService.createMaterial(formData);
       setMaterials([...materials, newMaterial]);
       setShowCreateModal(false);
-      setFormData({
+      setFormData(prev => ({
+        ...prev,
         title: '',
         description: '',
-        subject: 'Algebra',
-        difficulty: 'beginner',
-        type: 'lesson',
         content: '',
         contentUrl: '',
-        xpReward: 50,
-        estimatedTime: 30,
-      });
+      }));
     } catch (error) {
       console.error('Failed to create material:', error);
     }
@@ -307,15 +319,13 @@ export function Materials() {
                       Materia
                     </label>
                     <select
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      value={formData.subjectId}
+                      onChange={(e) => setFormData({ ...formData, subjectId: Number(e.target.value) })}
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     >
-                      <option value="Algebra">Álgebra</option>
-                      <option value="Calculus">Cálculo</option>
-                      <option value="Arithmetic">Aritmética</option>
-                      <option value="Geometry">Geometría</option>
-                      <option value="Statistics">Estadística</option>
+                      {subjects.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -326,51 +336,41 @@ export function Materials() {
                       Dificultad
                     </label>
                     <select
-                      value={formData.difficulty}
+                      value={formData.difficultyLevel}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          difficulty: e.target.value as LearningMaterial['difficulty'],
+                          difficultyLevel: Number(e.target.value),
                         })
                       }
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     >
-                      <option value="beginner">Principiante</option>
-                      <option value="intermediate">Intermedio</option>
-                      <option value="advanced">Avanzado</option>
+                      <option value={1}>Principiante</option>
+                      <option value={5}>Intermedio</option>
+                      <option value={10}>Avanzado</option>
                     </select>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      XP Recompensa
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.xpReward}
-                      onChange={(e) =>
-                        setFormData({ ...formData, xpReward: Number(e.target.value) })
-                      }
-                      className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Duración (min)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={formData.estimatedTime}
-                      onChange={(e) =>
-                        setFormData({ ...formData, estimatedTime: Number(e.target.value) })
-                      }
-                      className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
-                    />
-                  </div>
+                  {formData.type === 'exercise' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Lección Padre (Requerido para Ejercicios)
+                      </label>
+                      <select
+                        value={formData.lessonId || ''}
+                        onChange={(e) => setFormData({ ...formData, lessonId: e.target.value })}
+                        className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
+                      >
+                        <option value="">Selecciona una lección</option>
+                        {materials.filter(m => m.type === 'lesson').map(l => (
+                          <option key={l.id} value={l.id}>{l.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
+
+                {/* Legacy fields that are not supported by the backend are hidden or removed here, but we will leave them hidden if needed, or remove them */}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
