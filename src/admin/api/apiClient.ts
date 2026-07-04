@@ -24,5 +24,6 @@ export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T
     return {} as T;
   }
 
-  return response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : ({} as T);
 }

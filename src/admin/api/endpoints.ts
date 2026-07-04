@@ -33,6 +33,8 @@ export const storeEndpoints = {
   update: (id: string) => `${API_BASE_URL}/store/items/${id}`,
   delete: (id: string) => `${API_BASE_URL}/store/items/${id}`,
   updateStock: (id: string) => `${API_BASE_URL}/store/items/${id}/stock`,
+  getItemTypes: `${API_BASE_URL}/store/item-types`,
+  createItemType: `${API_BASE_URL}/store/item-types`,
 };
 
 export const challengeEndpoints = {

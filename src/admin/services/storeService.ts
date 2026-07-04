@@ -3,24 +3,48 @@ import { fetchApi } from '../api/apiClient';
 import type { StoreItem } from '../models/types';
 
 export class StoreService {
+  static async getAvatarItemTypeId(): Promise<number> {
+    const types = await fetchApi<any[]>(storeEndpoints.getItemTypes).catch(() => []);
+    let avatarType = types.find(t => t.name.toLowerCase() === 'avatar');
+    if (!avatarType) {
+      avatarType = await fetchApi<any>(storeEndpoints.createItemType, {
+        method: 'POST',
+        body: JSON.stringify({ name: 'avatar' })
+      }).catch(() => null);
+    }
+    return avatarType ? avatarType.id : 1;
+  }
+
   static async getAllItems(): Promise<StoreItem[]> {
-    const data = await fetchApi<any[]>(storeEndpoints.getAll);
-    return data.map(item => ({
-      id: item.id,
-      name: item.name,
-      description: item.description || '',
-      itemTypeId: item.itemTypeId,
-      category: item.itemTypeId === 1 ? 'avatar' : 'item' as any,
-      price: item.cost,
-      imageUrl: item.assetUrl,
-      isAvailable: true,
-      stock: item.stock
-    }));
+    const [data, itemTypes] = await Promise.all([
+      fetchApi<any[]>(storeEndpoints.getAll).catch(() => []),
+      fetchApi<any[]>(storeEndpoints.getItemTypes).catch(() => [])
+    ]);
+    
+    return data.map(item => {
+      const type = itemTypes.find(t => t.id === item.itemTypeId);
+      return {
+        id: item.id,
+        name: item.name,
+        description: item.description || '',
+        itemTypeId: item.itemTypeId,
+        category: type && type.name.toLowerCase() === 'avatar' ? 'avatar' : 'item' as any,
+        price: item.cost,
+        imageUrl: item.assetUrl,
+        isAvailable: true,
+        stock: item.stock
+      };
+    });
   }
 
   static async createItem(item: Omit<StoreItem, 'id' | 'createdAt'>): Promise<StoreItem> {
+    let typeId = item.itemTypeId || 1;
+    if (item.category === 'avatar') {
+      typeId = await this.getAvatarItemTypeId();
+    }
+
     const payload = {
-      itemTypeId: item.category === 'avatar' ? 1 : (item.itemTypeId || 1),
+      itemTypeId: typeId,
       name: item.name,
       cost: item.price,
       assetUrl: item.imageUrl
@@ -51,7 +75,7 @@ export class StoreService {
     if (updates.itemTypeId !== undefined) payload.itemTypeId = updates.itemTypeId;
 
     const data = await fetchApi<any>(storeEndpoints.update(id), {
-      method: 'PATCH', // or PUT depending on backend, backend uses PUT /api/admin/store/items/:id usually, but let's leave it as is if it's PATCH or PUT
+      method: 'PATCH',
       body: JSON.stringify(payload),
     });
 
@@ -60,7 +84,7 @@ export class StoreService {
       name: data.name,
       description: data.description || '',
       itemTypeId: data.itemTypeId,
-      category: data.itemTypeId === 1 ? 'avatar' : 'item' as any,
+      category: (updates.category || 'avatar') as any,
       price: data.cost,
       imageUrl: data.assetUrl,
       isAvailable: true

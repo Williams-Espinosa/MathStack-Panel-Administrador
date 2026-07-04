@@ -98,7 +98,7 @@ function UserProfileModal({
           </div>
         </div>
 
-        <div className="px-6 pb-6">
+        <div className="px-6 pb-6 relative z-10">
           <div className="flex flex-col items-center -mt-12 mb-5">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2563EB] to-[#1e40af] flex items-center justify-center text-white text-4xl font-extrabold shadow-xl ring-4 ring-white mb-3">
               {avatarLetter}
@@ -223,8 +223,18 @@ export function Users() {
   const handleUpdateCoins = async () => {
     if (!selectedUser || coinAmount <= 0) return;
     try {
-      const updated = await UserService.updateUserCoins(selectedUser.id, coinAmount, coinOperation);
-      setUsers(users.map((u) => (u.id === updated.id ? updated : u)));
+      const currentCoins = selectedUser.coins || 0;
+      const newTotal = coinOperation === 'add' ? currentCoins + coinAmount : Math.max(0, currentCoins - coinAmount);
+      
+      await UserService.updateUserCoins(selectedUser.id, newTotal);
+      
+      const updatedUser = { ...selectedUser, coins: newTotal };
+      setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+      
+      if (profileUser && profileUser.id === updatedUser.id) {
+        setProfileUser(updatedUser);
+      }
+      
       setShowCoinModal(false);
       setSelectedUser(null);
       setCoinAmount(0);

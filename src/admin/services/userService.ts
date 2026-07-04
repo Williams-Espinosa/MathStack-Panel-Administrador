@@ -17,12 +17,11 @@ export class UserService {
 
   static async updateUserCoins(
     userId: string,
-    amount: number,
-    operation: 'add' | 'remove'
+    newTotal: number
   ): Promise<User> {
     return fetchApi<User>(userEndpoints.updateCoins(userId), {
-      method: 'POST',
-      body: JSON.stringify({ amount, operation }),
+      method: 'PUT',
+      body: JSON.stringify({ coins: newTotal }),
     });
   }
 
