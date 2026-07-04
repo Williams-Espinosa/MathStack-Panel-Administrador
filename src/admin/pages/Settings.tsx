@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { User, Bell, Shield, Save, Key, Eye, EyeOff } from 'lucide-react';
-
-type Tab = 'profile' | 'notifications' | 'security';
+import { AuthService } from '../services/authService';
+import type { AdminUser } from '../models/types';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -18,31 +18,84 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export function Settings() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [showPassword, setShowPassword] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const [settings, setSettings] = useState({
-    adminName: user?.name || 'Admin User',
-    adminEmail: user?.email || 'admin@mathstack.com',
-    emailNotifications: true,
-    challengeAlerts: true,
-    userReports: false,
-    systemUpdates: true,
-    twoFactorAuth: false,
-    sessionTimeout: 30,
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+  // Load initial settings from localStorage or defaults
+  const [settings, setSettings] = useState(() => {
+    const savedSettings = localStorage.getItem('admin_settings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        return {
+          adminName: user?.username || parsed.adminName || 'Admin User',
+          adminEmail: user?.email || parsed.adminEmail || 'admin@mathstack.com',
+          emailNotifications: parsed.emailNotifications ?? true,
+          challengeAlerts: parsed.challengeAlerts ?? true,
+          newPassword: '',
+          confirmPassword: '',
+        };
+      } catch (e) {
+        // ignore
+      }
+    }
+    return {
+      adminName: user?.username || 'Admin User',
+      adminEmail: user?.email || 'admin@mathstack.com',
+      emailNotifications: true,
+      challengeAlerts: true,
+      newPassword: '',
+      confirmPassword: '',
+    };
   });
 
-  const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
-    { id: 'profile', label: 'Perfil', icon: User },
-    { id: 'notifications', label: 'Notificaciones', icon: Bell },
-    { id: 'security', label: 'Seguridad', icon: Shield },
-  ];
+  // Ensure name and email sync with auth state if not modified yet
+  useEffect(() => {
+    if (user && !localStorage.getItem('admin_settings')) {
+      setSettings(s => ({
+        ...s,
+        adminName: user.username,
+        adminEmail: user.email,
+      }));
+    }
+  }, [user]);
 
   const handleSave = () => {
+    // Basic validation for password
+    if (settings.newPassword || settings.confirmPassword) {
+      if (settings.newPassword !== settings.confirmPassword) {
+        alert('Las contraseñas no coinciden.');
+        return;
+      }
+    }
+
+    // Save to localStorage
+    const settingsToSave = {
+      adminName: settings.adminName,
+      adminEmail: settings.adminEmail,
+      emailNotifications: settings.emailNotifications,
+      challengeAlerts: settings.challengeAlerts,
+    };
+    localStorage.setItem('admin_settings', JSON.stringify(settingsToSave));
+
+    // Update current user in localStorage so header name updates on reload
+    if (user) {
+      const updatedUser: AdminUser = {
+        ...user,
+        username: settings.adminName,
+        email: settings.adminEmail,
+      };
+      const token = localStorage.getItem('admin_token') || '';
+      AuthService.saveSession(updatedUser, token);
+    }
+
+    // Reset password fields after save
+    setSettings(s => ({
+      ...s,
+      newPassword: '',
+      confirmPassword: '',
+    }));
+
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   };
@@ -52,36 +105,42 @@ export function Settings() {
 
   return (
     <div className="p-6 max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-lg font-bold text-gray-900">Configuración</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Gestiona tu cuenta y preferencias</p>
-      </div>
-
-      <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-2xl w-fit">
-        {tabs.map(({ id, label, icon: Icon }) => (
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-bold text-gray-900">Configuración</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Gestiona tu cuenta y preferencias</p>
+        </div>
+        <div className="flex items-center gap-3">
           <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${activeTab === id
-                ? 'bg-white text-[#2563EB] shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-              }`}
+            onClick={handleSave}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all"
           >
-            <Icon className="w-4 h-4" />
-            {label}
+            <Save className="w-4 h-4" />
+            Guardar cambios
           </button>
-        ))}
+          {saved && (
+            <span className="text-sm font-semibold text-green-600 animate-[fadeIn_0.3s_ease-out]">
+              ✓ Guardado
+            </span>
+          )}
+        </div>
       </div>
 
-      {activeTab === 'profile' && (
+      <div className="space-y-8">
+        
+        {/* PROFILE SECTION */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+          <div className="flex items-center gap-2 mb-2">
+            <User className="w-5 h-5 text-[#2563EB]" />
+            <h2 className="text-base font-bold text-gray-900">Perfil</h2>
+          </div>
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center text-white text-xl font-bold shadow-lg flex-shrink-0">
               {initials}
             </div>
             <div>
               <p className="font-bold text-gray-900">{settings.adminName}</p>
-              <p className="text-sm text-gray-400">{user?.role === 'super_admin' ? 'Super Admin' : 'Administrador'}</p>
+              <p className="text-sm text-gray-400">{user?.accessLevel === 'ADMIN' ? 'Administrador' : 'Usuario'}</p>
             </div>
           </div>
 
@@ -110,77 +169,53 @@ export function Settings() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Rol</label>
               <input
                 type="text"
-                value={user?.role === 'super_admin' ? 'Super Admin' : 'Administrador'}
+                value={user?.accessLevel === 'ADMIN' ? 'Administrador' : 'Usuario'}
                 disabled
                 className="w-full px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 text-gray-400 text-sm cursor-not-allowed"
               />
             </div>
           </div>
         </div>
-      )}
 
-      {activeTab === 'notifications' && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-50">
-          {[
-            { key: 'emailNotifications', label: 'Notificaciones por Email', desc: 'Recibe alertas importantes por correo' },
-            { key: 'challengeAlerts', label: 'Alertas de Retos', desc: 'Cuando se crea o completa un reto' },
-            { key: 'userReports', label: 'Reportes de Usuarios', desc: 'Alertas de reportes o problemas' },
-            { key: 'systemUpdates', label: 'Actualizaciones del Sistema', desc: 'Mantenimiento y novedades' },
-          ].map(({ key, label, desc }) => (
-            <div key={key} className="flex items-center justify-between px-6 py-4">
-              <div>
-                <p className="text-sm font-semibold text-gray-800">{label}</p>
-                <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+        {/* NOTIFICATIONS SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Bell className="w-5 h-5 text-[#2563EB]" />
+            <h2 className="text-base font-bold text-gray-900">Notificaciones</h2>
+          </div>
+          
+          <div className="divide-y divide-gray-50 border border-gray-100 rounded-xl">
+            {[
+              { key: 'emailNotifications', label: 'Notificaciones por Email', desc: 'Recibe alertas importantes por correo' },
+              { key: 'challengeAlerts', label: 'Alertas de Retos', desc: 'Cuando se crea o completa un reto' },
+            ].map(({ key, label, desc }) => (
+              <div key={key} className="flex items-center justify-between px-6 py-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{label}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                </div>
+                <Toggle
+                  checked={settings[key as keyof typeof settings] as boolean}
+                  onChange={(v) => setSettings({ ...settings, [key]: v })}
+                />
               </div>
-              <Toggle
-                checked={settings[key as keyof typeof settings] as boolean}
-                onChange={(v) => setSettings({ ...settings, [key]: v })}
-              />
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      )}
 
-      {activeTab === 'security' && (
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-4 flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold text-gray-800">Autenticación de dos factores</p>
-              <p className="text-xs text-gray-400 mt-0.5">Agrega una capa extra de seguridad</p>
-            </div>
-            <Toggle
-              checked={settings.twoFactorAuth}
-              onChange={(v) => setSettings({ ...settings, twoFactorAuth: v })}
-            />
+        {/* SECURITY SECTION */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="w-5 h-5 text-[#2563EB]" />
+            <h2 className="text-base font-bold text-gray-900">Seguridad</h2>
           </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5">
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
-              Tiempo de expiración de sesión
-            </label>
-            <div className="flex items-center gap-4">
-              <input
-                type="range"
-                min="5"
-                max="120"
-                step="5"
-                value={settings.sessionTimeout}
-                onChange={(e) => setSettings({ ...settings, sessionTimeout: Number(e.target.value) })}
-                className="flex-1 accent-[#2563EB]"
-              />
-              <span className="w-20 text-center text-sm font-bold text-[#2563EB] bg-blue-50 px-3 py-1.5 rounded-xl">
-                {settings.sessionTimeout} min
-              </span>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-6 py-5 space-y-4">
+          
+          <div className="border border-gray-100 rounded-xl px-6 py-5 space-y-4">
             <div className="flex items-center gap-2 mb-1">
               <Key className="w-4 h-4 text-[#2563EB]" />
               <p className="text-sm font-bold text-gray-800">Cambiar contraseña</p>
             </div>
             {[
-              { key: 'currentPassword', label: 'Contraseña actual', placeholder: '••••••••' },
               { key: 'newPassword', label: 'Nueva contraseña', placeholder: '••••••••' },
               { key: 'confirmPassword', label: 'Confirmar contraseña', placeholder: '••••••••' },
             ].map(({ key, label, placeholder }) => (
@@ -206,21 +241,7 @@ export function Settings() {
             ))}
           </div>
         </div>
-      )}
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={handleSave}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1d4ed8] text-white font-bold text-sm shadow-lg shadow-blue-500/25 transition-all"
-        >
-          <Save className="w-4 h-4" />
-          Guardar cambios
-        </button>
-        {saved && (
-          <span className="text-sm font-semibold text-green-600 animate-[fadeIn_0.3s_ease-out]">
-            ✓ Guardado correctamente
-          </span>
-        )}
       </div>
     </div>
   );
