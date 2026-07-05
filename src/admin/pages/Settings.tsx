@@ -19,7 +19,6 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 export function Settings() {
   const { user } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const [settings, setSettings] = useState({
@@ -27,8 +26,6 @@ export function Settings() {
     adminEmail: user?.email || 'admin@mathstack.com',
     emailNotifications: true,
     challengeAlerts: true,
-    newPassword: '',
-    confirmPassword: '',
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -202,45 +199,6 @@ export function Settings() {
             ))}
           </div>
         </div>
-
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Shield className="w-5 h-5 text-[#2563EB]" />
-            <h2 className="text-base font-bold text-gray-900">Seguridad</h2>
-          </div>
-
-          <div className="border border-gray-100 rounded-xl px-6 py-5 space-y-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Key className="w-4 h-4 text-[#2563EB]" />
-              <p className="text-sm font-bold text-gray-800">Cambiar contraseña</p>
-            </div>
-            {[
-              { key: 'newPassword', label: 'Nueva contraseña', placeholder: '••••••••' },
-              { key: 'confirmPassword', label: 'Confirmar contraseña', placeholder: '••••••••' },
-            ].map(({ key, label, placeholder }) => (
-              <div key={key}>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">{label}</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={settings[key as keyof typeof settings] as string}
-                    onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
-                    placeholder={placeholder}
-                    className="w-full px-4 pr-11 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-[#2563EB] focus:outline-none transition-all text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
       </div>
     </div>
   );
