@@ -95,7 +95,7 @@ export interface Challenge {
   description: string;
   subjectId?: number;
   subject?: string;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
   startDate?: string;
   endDate?: string;
   rewardCoins?: number;

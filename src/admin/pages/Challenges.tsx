@@ -11,7 +11,7 @@ export function Challenges() {
     title: '',
     description: '',
     subject: 'Aritmética',
-    difficulty: 'medium' as Challenge['difficulty'],
+    difficulty: 'intermediate' as Challenge['difficulty'],
     startDate: '',
     endDate: '',
     rewardCoins: 0,
@@ -46,7 +46,7 @@ export function Challenges() {
         title: '',
         description: '',
         subject: 'Aritmética',
-        difficulty: 'medium',
+        difficulty: 'intermediate',
         startDate: '',
         endDate: '',
         rewardCoins: 0,
@@ -73,11 +73,11 @@ export function Challenges() {
 
   const getDifficultyColor = (difficulty: Challenge['difficulty']) => {
     const colors = {
-      easy: 'bg-green-100 text-green-700',
-      medium: 'bg-yellow-100 text-yellow-700',
-      hard: 'bg-red-100 text-red-700',
+      beginner: 'bg-green-100 text-green-700',
+      intermediate: 'bg-yellow-100 text-yellow-700',
+      advanced: 'bg-red-100 text-red-700',
     };
-    return colors[difficulty];
+    return colors[difficulty] || 'bg-gray-100 text-gray-700';
   };
 
   if (loading) {
@@ -186,11 +186,11 @@ export function Challenges() {
                       <p className="text-gray-600 text-sm mb-3">{challenge.description}</p>
                     </div>
                     <span
-                      className={`px-3 py-1 rounded-lg text-xs font-medium ${getDifficultyColor(
+                      className={`px-3 py-1 rounded-lg text-xs font-medium capitalize ${getDifficultyColor(
                         challenge.difficulty
                       )}`}
                     >
-                      {challenge.difficulty}
+                      {challenge.difficulty === 'beginner' ? 'Principiante' : challenge.difficulty === 'intermediate' ? 'Intermedio' : 'Avanzado'}
                     </span>
                   </div>
 
@@ -365,9 +365,9 @@ export function Challenges() {
                       }
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     >
-                      <option value="easy">Fácil</option>
-                      <option value="medium">Medio</option>
-                      <option value="hard">Difícil</option>
+                      <option value="beginner">Principiante</option>
+                      <option value="intermediate">Intermedio</option>
+                      <option value="advanced">Avanzado</option>
                     </select>
                   </div>
                 </div>
