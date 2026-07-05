@@ -43,7 +43,7 @@ export class MaterialService {
       const payload = {
         lessonId: material.lessonId,
         content: material.content,
-        conceptTested: material.title, // using title as concept since concept is missing
+        conceptTested: material.title,
       };
       const response = await fetchApi<any>(exerciseEndpoints.create, {
         method: 'POST',
@@ -53,9 +53,9 @@ export class MaterialService {
     } else {
       const payload = {
         subjectId: material.subjectId,
-        lessonTypeId: material.lessonTypeId || 1, // Fallback if missing
+        lessonTypeId: material.lessonTypeId || 1,
         title: material.title,
-        difficultyLevel: material.difficultyLevel || 5, // Fallback
+        difficultyLevel: material.difficultyLevel || 5,
         content: material.content,
       };
       const response = await fetchApi<any>(lessonEndpoints.create, {

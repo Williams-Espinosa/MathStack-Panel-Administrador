@@ -10,7 +10,7 @@ export function Challenges() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    subject: 'Algebra',
+    subject: 'Aritmética',
     difficulty: 'medium' as Challenge['difficulty'],
     startDate: '',
     endDate: '',
@@ -45,7 +45,7 @@ export function Challenges() {
       setFormData({
         title: '',
         description: '',
-        subject: 'Algebra',
+        subject: 'Aritmética',
         difficulty: 'medium',
         startDate: '',
         endDate: '',
@@ -342,11 +342,12 @@ export function Challenges() {
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     >
-                      <option value="Algebra">Álgebra</option>
-                      <option value="Calculus">Cálculo</option>
-                      <option value="Arithmetic">Aritmética</option>
-                      <option value="Geometry">Geometría</option>
-                      <option value="Statistics">Estadística</option>
+                      <option value="Aritmética">Aritmética</option>
+                      <option value="Álgebra">Álgebra</option>
+                      <option value="Cálculo Integral">Cálculo Integral</option>
+                      <option value="Cálculo Diferencial">Cálculo Diferencial</option>
+                      <option value="Cálculo de Varias Variables">Cálculo de Varias Variables</option>
+                      <option value="Ecuaciones Diferenciales">Ecuaciones Diferenciales</option>
                     </select>
                   </div>
 

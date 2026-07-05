@@ -36,7 +36,7 @@ export function Materials() {
     setMaterials(data);
     setSubjects(subjectsData);
     setLessonTypes(lessonTypesData);
-    
+
     if (subjectsData.length > 0) {
       setFormData(prev => ({ ...prev, subjectId: subjectsData[0].id }));
     }
@@ -309,8 +309,6 @@ export function Materials() {
                     >
                       <option value="lesson">Lección</option>
                       <option value="exercise">Ejercicio</option>
-                      <option value="video">Video</option>
-                      <option value="pdf">PDF</option>
                     </select>
                   </div>
 
@@ -369,8 +367,6 @@ export function Materials() {
                     </div>
                   )}
                 </div>
-
-                {/* Legacy fields that are not supported by the backend are hidden or removed here, but we will leave them hidden if needed, or remove them */}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

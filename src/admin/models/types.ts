@@ -134,7 +134,7 @@ export interface LearningMaterial {
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   difficultyLevel: number;
 
-  type: 'lesson' | 'exercise' | 'video' | 'pdf';
+  type: 'lesson' | 'exercise';
   contentUrl?: string;
   content?: string;
 

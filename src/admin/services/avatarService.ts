@@ -1,4 +1,3 @@
-// Avatar Service - DiceBear Integration
 import type { Avatar } from '../models/types';
 
 const DICEBEAR_STYLES = [
