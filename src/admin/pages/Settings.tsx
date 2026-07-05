@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { User, Bell, Shield, Save, Key, Eye, EyeOff } from 'lucide-react';
 import { AuthService } from '../services/authService';
 import { SettingsService } from '../services/settingsService';
+import { useAuth } from '../hooks/useAuth';
+import { fetchApi } from '../api/apiClient';
+import { userEndpoints } from '../api/endpoints';
 import type { AdminUser } from '../models/types';
 
 function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) {
@@ -68,6 +70,14 @@ export function Settings() {
       });
 
       if (user) {
+        await fetchApi(userEndpoints.updateProfile(user.id), {
+          method: 'PATCH',
+          body: JSON.stringify({
+            username: settings.adminName,
+            email: settings.adminEmail,
+          }),
+        });
+
         const updatedUser: AdminUser = {
           ...user,
           username: settings.adminName,

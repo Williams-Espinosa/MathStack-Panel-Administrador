@@ -28,7 +28,7 @@ export const userEndpoints = {
   updateXP: (id: string) => `${API_BASE_URL}/admin/users/${id}/xp`,
   getUserActivity: (id: string) => `${API_BASE_URL}/admin/users/${id}/activity`,
   banUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/ban`,
-  unbanUser: (id: string) => `${API_BASE_URL}/admin/users/${id}/unban`,
+  updateProfile: (id: string) => `${API_BASE_URL}/users/${id}`,
 };
 
 export const storeEndpoints = {
