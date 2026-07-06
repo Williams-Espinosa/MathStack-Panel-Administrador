@@ -379,9 +379,9 @@ export function Challenges() {
                     </label>
                     <input
                       type="datetime-local"
-                      value={formData.startDate.slice(0, 16)}
+                      value={formData.startDate}
                       onChange={(e) =>
-                        setFormData({ ...formData, startDate: new Date(e.target.value).toISOString() })
+                        setFormData({ ...formData, startDate: e.target.value })
                       }
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     />
@@ -393,9 +393,9 @@ export function Challenges() {
                     </label>
                     <input
                       type="datetime-local"
-                      value={formData.endDate.slice(0, 16)}
+                      value={formData.endDate}
                       onChange={(e) =>
-                        setFormData({ ...formData, endDate: new Date(e.target.value).toISOString() })
+                        setFormData({ ...formData, endDate: e.target.value })
                       }
                       className="w-full px-4 py-3.5 rounded-2xl border-2 border-blue-200/50 bg-white/80 focus:border-blue-500 focus:outline-none focus:shadow-lg focus:shadow-blue-500/20 transition-all font-medium"
                     />

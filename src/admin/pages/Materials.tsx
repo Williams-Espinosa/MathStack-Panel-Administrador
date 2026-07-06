@@ -10,6 +10,7 @@ export function Materials() {
   const [lessonTypes, setLessonTypes] = useState<LessonTypeRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingMaterialId, setEditingMaterialId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<LearningMaterial>>({
     title: '',
     description: '',
@@ -53,9 +54,16 @@ export function Materials() {
     }
 
     try {
-      const newMaterial = await MaterialService.createMaterial(formData);
-      setMaterials([...materials, newMaterial]);
+      if (editingMaterialId) {
+        const updatedMaterial = await MaterialService.updateMaterial(editingMaterialId, formData);
+        setMaterials(materials.map(m => m.id === editingMaterialId ? { ...m, ...updatedMaterial } : m));
+      } else {
+        const newMaterial = await MaterialService.createMaterial(formData);
+        setMaterials([...materials, newMaterial]);
+      }
+      
       setShowCreateModal(false);
+      setEditingMaterialId(null);
       setFormData(prev => ({
         ...prev,
         title: '',
@@ -137,7 +145,21 @@ export function Materials() {
             <p className="text-gray-600 font-medium ml-15">Gestiona lecciones, ejercicios y recursos educativos</p>
           </div>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              setEditingMaterialId(null);
+              setFormData({
+                title: '',
+                description: '',
+                subjectId: subjects[0]?.id || 1,
+                lessonTypeId: lessonTypes[0]?.id || 1,
+                difficultyLevel: 1,
+                type: 'lesson',
+                content: '',
+                contentUrl: '',
+                lessonId: '',
+              });
+              setShowCreateModal(true);
+            }}
             className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all duration-300 shadow-xl shadow-blue-500/40"
           >
             <Plus className="w-5 h-5" />
@@ -234,7 +256,24 @@ export function Materials() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-center gap-2">
-                        <button className="p-2 rounded-lg hover:bg-blue-100 text-blue-600">
+                        <button 
+                          onClick={() => {
+                            setEditingMaterialId(material.id);
+                            setFormData({
+                              title: material.title,
+                              description: material.description,
+                              type: material.type,
+                              subjectId: subjects.find(s => s.name === material.subject)?.id || subjects[0]?.id || 1,
+                              lessonTypeId: 1, // Defaulting as we don't have this in LearningMaterial interface directly mapped by default, but it's okay for edit
+                              difficultyLevel: material.difficulty === 'beginner' ? 1 : material.difficulty === 'intermediate' ? 5 : 10,
+                              content: material.content || '',
+                              contentUrl: material.contentUrl || '',
+                              lessonId: material.type === 'exercise' ? (material as any).lessonId : '',
+                            });
+                            setShowCreateModal(true);
+                          }}
+                          className="p-2 rounded-lg hover:bg-blue-100 text-blue-600"
+                        >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
@@ -262,7 +301,9 @@ export function Materials() {
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/40">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-cyan-900 bg-clip-text text-transparent">Agregar Nuevo Material</h3>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-cyan-900 bg-clip-text text-transparent">
+                  {editingMaterialId ? 'Editar Material' : 'Agregar Nuevo Material'}
+                </h3>
               </div>
 
               <div className="space-y-4">
@@ -412,7 +453,7 @@ export function Materials() {
                   onClick={handleCreateMaterial}
                   className="flex-1 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all"
                 >
-                  Agregar Material
+                  {editingMaterialId ? 'Guardar Cambios' : 'Agregar Material'}
                 </button>
               </div>
             </div>
