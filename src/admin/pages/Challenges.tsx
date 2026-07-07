@@ -151,7 +151,7 @@ export function Challenges() {
               <Users className="w-6 h-6 text-cyan-600" />
             </div>
             <h3 className="text-5xl font-bold text-cyan-900 mb-1">
-              {challenges.reduce((sum, c) => sum + c.participants, 0)}
+              {challenges.reduce((sum, c) => sum + (c.participants || 0), 0)}
             </h3>
           </div>
         </div>
