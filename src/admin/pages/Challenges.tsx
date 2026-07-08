@@ -7,6 +7,7 @@ export function Challenges() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingChallengeId, setEditingChallengeId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -32,16 +33,22 @@ export function Challenges() {
     setLoading(false);
   };
 
-  const handleCreateChallenge = async () => {
+  const handleSubmitChallenge = async () => {
     if (!formData.title || !formData.description || !formData.startDate || !formData.endDate) {
       alert('Por favor completa todos los campos');
       return;
     }
 
     try {
-      const newChallenge = await ChallengeService.createChallenge(formData);
-      setChallenges([...challenges, newChallenge]);
+      if (editingChallengeId) {
+        const updatedChallenge = await ChallengeService.updateChallenge(editingChallengeId, formData);
+        setChallenges(challenges.map(c => c.id === editingChallengeId ? { ...c, ...updatedChallenge } : c));
+      } else {
+        const newChallenge = await ChallengeService.createChallenge(formData);
+        setChallenges([...challenges, newChallenge]);
+      }
       setShowCreateModal(false);
+      setEditingChallengeId(null);
       setFormData({
         title: '',
         description: '',
@@ -56,7 +63,7 @@ export function Challenges() {
         isActive: true,
       });
     } catch (error) {
-      console.error('Failed to create challenge:', error);
+      console.error('Failed to save challenge:', error);
     }
   };
 
@@ -111,7 +118,23 @@ export function Challenges() {
             <p className="text-gray-600 font-medium ml-15">Crea y gestiona retos para motivar a los estudiantes</p>
           </div>
           <button
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              setEditingChallengeId(null);
+              setFormData({
+                title: '',
+                description: '',
+                subject: 'Aritmética',
+                difficulty: 'intermediate',
+                startDate: '',
+                endDate: '',
+                rewardCoins: 0,
+                rewardXP: 0,
+                targetScore: 80,
+                createdBy: 'admin',
+                isActive: true,
+              });
+              setShowCreateModal(true);
+            }}
             className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-semibold hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all duration-300 shadow-xl shadow-blue-500/40"
           >
             <Plus className="w-5 h-5" />
@@ -243,7 +266,27 @@ export function Challenges() {
                   </div>
 
                   <div className="flex gap-2">
-                    <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
+                    <button 
+                      onClick={() => {
+                        const toLocal = (dStr?: string) => dStr ? new Date(new Date(dStr).getTime() - new Date(dStr).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+                        setEditingChallengeId(challenge.id);
+                        setFormData({
+                          title: challenge.title || '',
+                          description: challenge.description || '',
+                          subject: challenge.subject || 'Aritmética',
+                          difficulty: challenge.difficulty || 'intermediate',
+                          startDate: toLocal(challenge.startDate),
+                          endDate: toLocal(challenge.endDate),
+                          rewardCoins: challenge.rewardCoins || 0,
+                          rewardXP: challenge.rewardXP || 0,
+                          targetScore: challenge.targetScore || 80,
+                          createdBy: 'admin',
+                          isActive: challenge.isActive,
+                        });
+                        setShowCreateModal(true);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                    >
                       <Edit className="w-4 h-4" />
                       <span className="text-sm font-medium">Editar</span>
                     </button>
@@ -302,7 +345,9 @@ export function Challenges() {
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/40">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-cyan-900 bg-clip-text text-transparent">Crear Nuevo Reto</h3>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-900 to-cyan-900 bg-clip-text text-transparent">
+                  {editingChallengeId ? 'Editar Reto' : 'Crear Nuevo Reto'}
+                </h3>
               </div>
 
               <div className="space-y-4">
@@ -453,16 +498,19 @@ export function Challenges() {
 
               <div className="flex gap-3 mt-8">
                 <button
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setEditingChallengeId(null);
+                  }}
                   className="flex-1 px-6 py-3.5 rounded-2xl border-2 border-gray-300 hover:bg-gray-50 hover:shadow-lg font-bold transition-all"
                 >
                   Cancelar
                 </button>
                 <button
-                  onClick={handleCreateChallenge}
+                  onClick={handleSubmitChallenge}
                   className="flex-1 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold hover:shadow-2xl hover:shadow-blue-500/50 hover:-translate-y-0.5 transition-all"
                 >
-                  Crear Reto
+                  {editingChallengeId ? 'Guardar Cambios' : 'Crear Reto'}
                 </button>
               </div>
             </div>
