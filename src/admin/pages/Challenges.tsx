@@ -323,11 +323,45 @@ export function Challenges() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                     <div className="flex items-center gap-2">
                       <Users className="w-4 h-4" />
                       <span>{challenge.participants} participantes</span>
                     </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4">
+                    <button 
+                      onClick={() => {
+                        const toLocal = (dStr?: string) => dStr ? new Date(new Date(dStr).getTime() - new Date(dStr).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : '';
+                        setEditingChallengeId(challenge.id);
+                        setFormData({
+                          title: challenge.title || '',
+                          description: challenge.description || '',
+                          subject: challenge.subject || 'Aritmética',
+                          difficulty: challenge.difficulty || 'intermediate',
+                          startDate: toLocal(challenge.startDate),
+                          endDate: toLocal(challenge.endDate),
+                          rewardCoins: challenge.rewardCoins || 0,
+                          rewardXP: challenge.rewardXP || 0,
+                          targetScore: challenge.targetScore || 80,
+                          createdBy: 'admin',
+                          isActive: challenge.isActive,
+                        });
+                        setShowCreateModal(true);
+                      }}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                    >
+                      <Edit className="w-4 h-4" />
+                      <span className="text-sm font-medium">Editar</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteChallenge(challenge.id)}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      <span className="text-sm font-medium">Eliminar</span>
+                    </button>
                   </div>
                 </div>
               ))}
