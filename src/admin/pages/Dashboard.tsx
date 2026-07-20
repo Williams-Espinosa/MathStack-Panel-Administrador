@@ -378,22 +378,22 @@ export function Dashboard() {
             </thead>
             <tbody className="divide-y divide-gray-50">
               {stats.difficultyStats
-                .sort((a, b) => b.failureRate - a.failureRate)
+                .sort((a, b) => (b.failureRate || 0) - (a.failureRate || 0))
                 .map((stat) => (
                   <tr key={stat.subjectId} className="hover:bg-gray-50/70 transition-colors">
                     <td className="py-3 px-3 text-sm font-semibold text-gray-800">{stat.subjectName}</td>
                     <td className="py-3 px-3 text-right text-sm text-gray-600 font-medium">{stat.totalAttempts.toLocaleString()}</td>
                     <td className="py-3 px-3 text-right">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${stat.failureRate > 0.5
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${(stat.failureRate || 0) > 0.5
                           ? 'bg-red-50 text-red-600'
-                          : stat.failureRate > 0.35
+                          : (stat.failureRate || 0) > 0.35
                             ? 'bg-amber-50 text-amber-600'
                             : 'bg-green-50 text-green-600'
                         }`}>
-                        {(stat.failureRate * 100).toFixed(1)}%
+                        {((stat.failureRate || 0) * 100).toFixed(1)}%
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-right text-sm text-gray-600 font-medium">{stat.averageScore.toFixed(1)}</td>
+                    <td className="py-3 px-3 text-right text-sm text-gray-600 font-medium">{(stat.averageScore || 0).toFixed(1)}</td>
                     <td className="py-3 px-3 text-right">
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-red-600">
                         {stat.usersStruggling}
