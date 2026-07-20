@@ -16,6 +16,9 @@ export async function fetchApi<T>(url: string, options?: RequestInit): Promise<T
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      window.dispatchEvent(new Event('unauthorized'));
+    }
     const errorData = await response.json().catch(() => null);
     throw new Error(errorData?.message || `Error ${response.status}: ${response.statusText}`);
   }

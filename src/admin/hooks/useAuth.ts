@@ -9,6 +9,15 @@ export function useAuth() {
 
   useEffect(() => {
     checkAuth();
+
+    const handleUnauthorized = () => {
+      logout();
+    };
+
+    window.addEventListener('unauthorized', handleUnauthorized);
+    return () => {
+      window.removeEventListener('unauthorized', handleUnauthorized);
+    };
   }, []);
 
   const checkAuth = () => {
