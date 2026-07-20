@@ -69,6 +69,24 @@ export interface DashboardStats {
     subject: string;
     count: number;
   }[];
+
+  timeDistribution: {
+    hour: string;
+    users: number;
+  }[];
+
+  weeklyEngagement: {
+    name: string;
+    sessions: number;
+    completions: number;
+    streaks: number;
+  }[];
+
+  userRetention: {
+    week: string;
+    retention: number;
+    active: number;
+  }[];
 }
 
 export interface StoreItem {

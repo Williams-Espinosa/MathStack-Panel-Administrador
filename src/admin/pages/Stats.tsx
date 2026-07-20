@@ -94,15 +94,7 @@ export function Stats() {
     );
   }
 
-  const engagementData = [
-    { name: 'Lun', sessions: 450, completions: 320, streaks: 280 },
-    { name: 'Mar', sessions: 520, completions: 380, streaks: 310 },
-    { name: 'Mié', sessions: 680, completions: 490, streaks: 420 },
-    { name: 'Jue', sessions: 590, completions: 410, streaks: 350 },
-    { name: 'Vie', sessions: 710, completions: 520, streaks: 460 },
-    { name: 'Sáb', sessions: 820, completions: 600, streaks: 510 },
-    { name: 'Dom', sessions: 650, completions: 470, streaks: 390 },
-  ];
+  const engagementData = stats.weeklyEngagement || [];
 
   const performanceData = stats.difficultyStats.length > 0 
     ? stats.difficultyStats.map((stat) => ({
@@ -117,14 +109,7 @@ export function Stats() {
         { subject: 'Aritmética', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
       ];
 
-  const retentionData = [
-    { week: 'Semana 1', retention: 92, active: 850 },
-    { week: 'Semana 2', retention: 85, active: 780 },
-    { week: 'Semana 3', retention: 78, active: 720 },
-    { week: 'Semana 4', retention: 71, active: 650 },
-    { week: 'Semana 5', retention: 65, active: 590 },
-    { week: 'Semana 6', retention: 60, active: 540 },
-  ];
+  const retentionData = stats.userRetention || [];
 
   return (
     <div className="p-8 min-h-screen">
@@ -318,15 +303,7 @@ export function Stats() {
           <h3 className="text-xl font-bold text-gray-900 mb-6">Distribución de Tiempo</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
-              data={[
-                { hour: '00-06', users: 120 },
-                { hour: '06-09', users: 450 },
-                { hour: '09-12', users: 680 },
-                { hour: '12-15', users: 520 },
-                { hour: '15-18', users: 780 },
-                { hour: '18-21', users: 920 },
-                { hour: '21-24', users: 340 },
-              ]}
+              data={stats.timeDistribution || []}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="hour" stroke="#999" />
