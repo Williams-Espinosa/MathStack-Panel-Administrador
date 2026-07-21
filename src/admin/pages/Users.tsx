@@ -245,8 +245,10 @@ export function Users() {
 
   const filteredUsers = users.filter(
     (u) =>
-      u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase())
+      u.username !== 'Usuario Eliminado' &&
+      !u.email.startsWith('borrado_') &&
+      (u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   if (loading) {

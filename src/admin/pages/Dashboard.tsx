@@ -385,10 +385,10 @@ export function Dashboard() {
                     <td className="py-3 px-3 text-right text-sm text-gray-600 font-medium">{stat.totalAttempts.toLocaleString()}</td>
                     <td className="py-3 px-3 text-right">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${(stat.failureRate || 0) > 0.5
-                          ? 'bg-red-50 text-red-600'
-                          : (stat.failureRate || 0) > 0.35
-                            ? 'bg-amber-50 text-amber-600'
-                            : 'bg-green-50 text-green-600'
+                        ? 'bg-red-50 text-red-600'
+                        : (stat.failureRate || 0) > 0.35
+                          ? 'bg-amber-50 text-amber-600'
+                          : 'bg-green-50 text-green-600'
                         }`}>
                         {((stat.failureRate || 0) * 100).toFixed(1)}%
                       </span>
@@ -403,29 +403,6 @@ export function Dashboard() {
                 ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-sm font-bold text-gray-900 mb-3">Vistas recientes</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {recentSections.map((s) => (
-            <div
-              key={s.label}
-              className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
-            >
-              <div
-                className="w-full h-20 rounded-xl mb-3 flex items-center justify-center"
-                style={{ backgroundColor: s.color + '12' }}
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: s.color + '22' }}>
-                  <span style={{ color: s.color }}>{s.icon}</span>
-                </div>
-              </div>
-              <p className="text-xs font-bold text-gray-800 leading-snug group-hover:text-[#2563EB] transition-colors">{s.label}</p>
-              <p className="text-xs text-gray-400 mt-0.5">Panel de estadísticas</p>
-            </div>
-          ))}
         </div>
       </div>
     </div>

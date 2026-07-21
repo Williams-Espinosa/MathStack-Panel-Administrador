@@ -111,6 +111,8 @@ export function Stats() {
 
   const retentionData = stats.userRetention || [];
 
+
+
   return (
     <div className="p-8 min-h-screen">
       <div className="mb-8 animate-[fadeIn_0.6s_ease-out]">
@@ -430,6 +432,8 @@ export function Stats() {
           </div>
         </div>
       </div>
+
+
 
       {showReportModal && (
         <div className="fixed inset-0 bg-gradient-to-br from-black/60 via-blue-900/30 to-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-[fadeIn_0.3s_ease-out]">
