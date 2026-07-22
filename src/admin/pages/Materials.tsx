@@ -61,7 +61,7 @@ export function Materials() {
         const newMaterial = await MaterialService.createMaterial(formData);
         setMaterials([...materials, newMaterial]);
       }
-      
+
       setShowCreateModal(false);
       setEditingMaterialId(null);
       setFormData(prev => ({
@@ -256,7 +256,7 @@ export function Materials() {
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-center gap-2">
-                        <button 
+                        <button
                           onClick={() => {
                             setEditingMaterialId(material.id);
                             setFormData({
@@ -264,7 +264,7 @@ export function Materials() {
                               description: material.description,
                               type: material.type,
                               subjectId: subjects.find(s => s.name === material.subject)?.id || subjects[0]?.id || 1,
-                              lessonTypeId: 1, // Defaulting as we don't have this in LearningMaterial interface directly mapped by default, but it's okay for edit
+                              lessonTypeId: 1,
                               difficultyLevel: material.difficulty === 'beginner' ? 1 : material.difficulty === 'intermediate' ? 5 : 10,
                               content: material.content || '',
                               contentUrl: material.contentUrl || '',

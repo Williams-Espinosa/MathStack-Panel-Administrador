@@ -24,12 +24,12 @@ import {
   Mail,
 } from 'lucide-react';
 
-function UserProfileModal({ 
-  user, 
+function UserProfileModal({
+  user,
   onClose,
   onUpdateCoins
-}: { 
-  user: User; 
+}: {
+  user: User;
   onClose: () => void;
   onUpdateCoins?: (operation: 'add' | 'remove') => void;
 }) {
@@ -124,7 +124,6 @@ function UserProfileModal({
             <p className="text-xs text-center text-gray-500 mt-2 font-medium">{userXp.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP</p>
           </div>
 
-          {/* Math Coins Section */}
           <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-4 mb-5 border border-yellow-100/50 shadow-sm flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center shadow-inner">
@@ -165,7 +164,6 @@ function UserProfileModal({
             ))}
           </div>
 
-          {/* Info rows */}
           <div className="space-y-3 bg-gray-50 rounded-2xl p-4 border border-gray-100">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2 text-gray-600 font-medium">
@@ -225,16 +223,16 @@ export function Users() {
     try {
       const currentCoins = selectedUser.coins || 0;
       const newTotal = coinOperation === 'add' ? currentCoins + coinAmount : Math.max(0, currentCoins - coinAmount);
-      
+
       await UserService.updateUserCoins(selectedUser.id, newTotal);
-      
+
       const updatedUser = { ...selectedUser, coins: newTotal };
       setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
-      
+
       if (profileUser && profileUser.id === updatedUser.id) {
         setProfileUser(updatedUser);
       }
-      
+
       setShowCoinModal(false);
       setSelectedUser(null);
       setCoinAmount(0);
@@ -243,12 +241,17 @@ export function Users() {
     }
   };
 
-  const filteredUsers = users.filter(
+  const studentUsers = users.filter(
     (u) =>
       u.username !== 'Usuario Eliminado' &&
       !u.email.startsWith('borrado_') &&
-      (u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase()))
+      ((u as any).accessLevel === 'STUDENT' || !(u as any).accessLevel)
+  );
+
+  const filteredUsers = studentUsers.filter(
+    (u) =>
+      u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -273,9 +276,9 @@ export function Users() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { label: 'Usuarios Totales', value: users.length, icon: UsersIcon, color: '#2563EB', bg: 'bg-blue-50' },
-          { label: 'Usuarios Activos', value: users.filter((u) => u.isActive || true).length, icon: Zap, color: '#22C55E', bg: 'bg-green-50' },
-          { label: 'Nivel Promedio', value: users.length ? Math.round(users.reduce((s, u) => s + (u.level || 0), 0) / users.length) : 0, icon: TrendingUp, color: '#F59E0B', bg: 'bg-amber-50' },
+          { label: 'Usuarios Totales', value: studentUsers.length, icon: UsersIcon, color: '#2563EB', bg: 'bg-blue-50' },
+          { label: 'Usuarios Activos', value: studentUsers.filter((u) => u.isActive || true).length, icon: Zap, color: '#22C55E', bg: 'bg-green-50' },
+          { label: 'Nivel Promedio', value: studentUsers.length ? Math.round(studentUsers.reduce((s, u) => s + (u.level || 0), 0) / studentUsers.length) : 0, icon: TrendingUp, color: '#F59E0B', bg: 'bg-amber-50' },
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div key={label} className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm flex items-center gap-4">
             <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center flex-shrink-0`}>
@@ -396,14 +399,13 @@ export function Users() {
       </div>
 
       {showProfile && profileUser && (
-        <UserProfileModal 
-          user={profileUser} 
+        <UserProfileModal
+          user={profileUser}
           onClose={() => { setShowProfile(false); setProfileUser(null); }}
           onUpdateCoins={(operation) => {
             setSelectedUser(profileUser);
             setCoinOperation(operation);
             setShowCoinModal(true);
-            // Optionally auto-close profile: setShowProfile(false);
           }}
         />
       )}

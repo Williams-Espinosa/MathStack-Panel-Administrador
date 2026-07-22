@@ -132,8 +132,8 @@ function EditModal({ item, onClose, onSave }: EditModalProps) {
                 type="button"
                 onClick={() => setIsAvailable(!isAvailable)}
                 className={`w-full py-3 rounded-xl border text-sm font-semibold transition-all ${isAvailable
-                    ? 'border-green-200 bg-green-50 text-green-700'
-                    : 'border-gray-200 bg-gray-50 text-gray-500'
+                  ? 'border-green-200 bg-green-50 text-green-700'
+                  : 'border-gray-200 bg-gray-50 text-gray-500'
                   }`}
               >
                 {isAvailable ? '✓ Disponible' : '✗ No disponible'}
@@ -332,7 +332,6 @@ export function Store() {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900">Tienda — Avatares</h1>
@@ -347,7 +346,6 @@ export function Store() {
         </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { label: 'Total Avatares', value: items.length, sub: `${available} disponibles`, icon: Users2, color: '#2563EB', bg: 'bg-blue-50' },
@@ -367,7 +365,6 @@ export function Store() {
         ))}
       </div>
 
-      {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
         <input
@@ -379,7 +376,6 @@ export function Store() {
         />
       </div>
 
-      {/* Grid */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
@@ -401,7 +397,6 @@ export function Store() {
                 key={item.id}
                 className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden relative"
               >
-                {/* Promo badge */}
                 {promo?.active && (
                   <div className="absolute top-3 left-3 z-10 flex items-center gap-1 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
                     <Percent className="w-3 h-3" />
@@ -409,10 +404,8 @@ export function Store() {
                   </div>
                 )}
 
-                {/* Availability dot */}
                 <div className={`absolute top-3 right-3 z-10 w-2.5 h-2.5 rounded-full border-2 border-white shadow ${item.isAvailable ? 'bg-green-500' : 'bg-gray-400'}`} />
 
-                {/* Image */}
                 <div className="aspect-square bg-gradient-to-br from-blue-50 to-indigo-50 p-6 flex items-center justify-center">
                   <img
                     src={item.imageUrl}
@@ -421,12 +414,10 @@ export function Store() {
                   />
                 </div>
 
-                {/* Info */}
                 <div className="p-4">
                   <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1 line-clamp-1">{item.name}</h3>
                   <p className="text-xs text-gray-400 mb-3 line-clamp-2 leading-relaxed">{item.description}</p>
 
-                  {/* Price row */}
                   <div className="flex items-center gap-2 mb-4">
                     {promoPrice !== null ? (
                       <>
@@ -442,7 +433,6 @@ export function Store() {
                     )}
                   </div>
 
-                  {/* Actions */}
                   <div className="flex gap-2">
                     <button
                       onClick={() => setEditItem(item)}
@@ -466,7 +456,6 @@ export function Store() {
         </div>
       )}
 
-      {/* Modals */}
       {showCreate && (
         <EditModal item={null} onClose={() => setShowCreate(false)} onSave={handleSave} />
       )}

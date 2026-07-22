@@ -50,7 +50,7 @@ export function Stats() {
 
   const handleGenerateReport = async () => {
     if (!stats) return;
-    
+
     setGenerating(true);
     setTimeout(() => {
       const reportData = {
@@ -96,18 +96,18 @@ export function Stats() {
 
   const engagementData = stats.weeklyEngagement || [];
 
-  const performanceData = stats.difficultyStats.length > 0 
+  const performanceData = stats.difficultyStats.length > 0
     ? stats.difficultyStats.map((stat) => ({
-        subject: stat.subjectName,
-        'Tasa Éxito': Number(((1 - (stat.failureRate || 0)) * 100).toFixed(1)),
-        'Promedio': Number((stat.averageScore || 0).toFixed(1)),
-        fullMark: 100,
-      }))
+      subject: stat.subjectName,
+      'Tasa Éxito': Number(((1 - (stat.failureRate || 0)) * 100).toFixed(1)),
+      'Promedio': Number((stat.averageScore || 0).toFixed(1)),
+      fullMark: 100,
+    }))
     : [
-        { subject: 'Geometría', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
-        { subject: 'Álgebra', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
-        { subject: 'Aritmética', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
-      ];
+      { subject: 'Geometría', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+      { subject: 'Álgebra', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+      { subject: 'Aritmética', 'Tasa Éxito': 0, Promedio: 0, fullMark: 100 },
+    ];
 
   const retentionData = stats.userRetention || [];
 
@@ -318,6 +318,40 @@ export function Stats() {
                 }}
               />
               <Bar dataKey="users" fill="#2563EB" radius={[8, 8, 0, 0]} name="Usuarios Activos" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl shadow-blue-500/10 p-6 border-2 border-blue-100/50 lg:col-span-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <TrendingUp className="w-6 h-6 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900">Tasa de Mejora por Materia</h3>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={stats.difficultyStats.length > 0 ? stats.difficultyStats.map((stat) => ({
+              subject: stat.subjectName,
+              rate: Number((stat.averageScore || 0).toFixed(1))
+            })) : []}>
+              <defs>
+                <linearGradient id="colorImprovement" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#c4b5fd" stopOpacity={0.2} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+              <XAxis dataKey="subject" stroke="#999" tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="#999" tickFormatter={(value) => `${value}%`} axisLine={false} tickLine={false} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: '12px',
+                  border: 'none',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                }}
+                formatter={(value) => [`${value}%`, 'Tasa de Mejora']}
+              />
+              <Bar dataKey="rate" fill="url(#colorImprovement)" radius={[8, 8, 0, 0]} barSize={32} />
             </BarChart>
           </ResponsiveContainer>
         </div>
